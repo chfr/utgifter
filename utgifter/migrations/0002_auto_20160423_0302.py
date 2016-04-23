@@ -81,6 +81,20 @@ def create_superuser(apps, schema_editor):
                                  is_staff=False)
     u.save()
 
+    t = Tag(user=u, color="#B51D1D", name="Mat (user1)")
+    t.save()
+    m = Matcher(user=u, name="Mat-matcher (user1)", method=Matcher.ICONTAINS, tag=t)
+    m.save()
+    ss = SearchString(user=u, matcher=m, string="hemköp")
+    ss.save()
+    ss = SearchString(user=u, matcher=m, string="ica")
+    ss.save()
+    ss = SearchString(user=u, matcher=m, string="coop")
+    ss.save()
+    ss = SearchString(user=u, matcher=m, string="7 eleven")
+    ss.save()
+    ss = SearchString(user=u, matcher=m, string="willys")
+    ss.save()
 
 class Migration(migrations.Migration):
     dependencies = [
