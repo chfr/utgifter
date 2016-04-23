@@ -1,0 +1,7 @@
+{% extends 'registration/login_layout.html' %}
+
+{%  block pagetitle  %}logged out!{% endblock %}
+
+{% block body %}
+Du är nu utloggad! <a href="{% url 'index' %}">hem</a>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends 'utgifter/master_layout.html' %}
+
+{%  block pagetitle  %} Tags {% endblock %}
+
+{% block head %}
+<script type="text/javascript">
+    var unsavedRow = false;
+    var editing = false;
+
+    var old_name = null;
+    var old_color = null;
+
+    $(document).ready(function() {
+        $(".editButton").click(setupEdit);
+    });
+
+    function setColorListener() {
+        var color = $("#color_input");
+        var reg = /#[A-Fa-f0-9]{6}/;
+        color.on("input", function() {
+            var col = color.val();
+            var match = reg.exec(col);
+            if (match != null) {
+                color.parent().removeAttr("style");
+                color.parent().css("background", col);
+            }
+        });
+    }
+
+    function removeColorListener() {
+        var color = $("#color_input");
+        color.unbind("input");
+    }
+
+    function setupEdit() {
+        var reg = /edit(\d+)_(\d+)/;
+        var match = reg.exec(this.id);
+        if (!match) return;
+
+        $(this).unbind("click");
+        $(this).click(resetEdit);
+
+        if (editing)
+            resetEdit();
+
+        editing = true;
+        $(this).text("Cancel");
+
+        var row = match[1];
+        var tagid = match[2];
+        console.log("editing row " + row + " with tag id " + tagid);
+
+        var td = $(this).parent();
+        td.prepend('<button id="save" class="btn btn-primary btn-sm">Save</button>');
+
+        var tr = td.parent();
+        var name = tr.find(".name");
+        old_name = name.html();
+        name.html('<input id="name_input" class="inputs" type="text" value="' + name.text() + '">');
+        var name_input = name.children()[0];
+        name_input.focus();
+        name_input.select();
+
+        var color = tr.find(".color");
+        old_color = color.html();
+        color.html('<input id="color_input" class="inputs" type="text" value="' + color.text() + '">');
+        var color_input = color.children()[0];
+
+        $(".inputs").keypress(function(e) {
+            if (e.which == 13) {
+                editTag(tagid, name_input.value, color_input.value);
+            }
+        });
+
+        $("#save").click(function() {
+            editTag(tagid, name_input.value, color_input.value);
+        });
+
+        setColorListener();
+    }
+
+    function resetEdit() {
+        console.log("resetting edit");
+        removeColorListener();
+
+        var editButton = $(".editButton");
+        editing = false;
+        editButton.text("Edit");
+        var td = editButton.parent();
+
+        td.find("#save").remove();
+
+        var tr = td.parent();
+        var name = tr.find(".name");
+        name.html(old_name);
+
+        var color = tr.find(".color");
+        color.html(old_color);
+
+        $(".editButton").click(setupEdit);
+    }
+
+    function editTag(tagid, name, color) {
+        console.log("changing tag " + tagid + " to " + name + " with col " + color);
+
+        $.post( "{% url 'edit_tag' %}", {"tagid": tagid, "name": name, "color": color},
+                function( data ) {
+                    if (data.error) {
+                        alert(data.msg);
+                        return;
+                    }
+
+                    window.location.replace("{% url 'tags' %}");
+            });
+    }
+
+    function addTag() {
+        if (unsavedRow) return;
+        unsavedRow = true;
+
+        $("#addRow").show();
+        $("#id_name").focus();
+    }
+
+    function closeRow() {
+        unsavedRow = true;
+
+        $("#addRow").hide();
+    }
+</script>
+{% endblock %}
+{% block body %}
+<div id="wrapper">
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <section id="content" class="col-md-8 col-md-offset-2">
+
+        {{ form.non_field_errors }}
+        <table id="tagtable" class="table table-striped table-bordered table-hover">
+            <tr>
+                <th>Tag name</th>
+                <th>Color</th>
+                <th>Actions</th>
+            </tr>
+            {% for tag in tags %}
+            <tr>
+                <td class="name">{{ tag.name }}</td>
+                <td class="color" style="background: {{ tag.color }}">{{ tag.color }}</td>
+                <td>
+                    <button id="edit{{ forloop.counter0 }}_{{ tag.pk }}" class="editButton btn btn-primary btn-sm">Edit</button>
+                    <a href="{% url 'delete_tag' tag.pk %}" class="btn btn-primary btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="addRow" style="display:none">
+                <form method="post">
+                    {% csrf_token %}
+                    <td>{{ form.name.errors }}
+                        {{ form.name }}
+                    </td>
+                    <td style="background: {{ default_color }}">{{ form.color.errors }}
+                        {{ form.color }}
+                    </td>
+                    <td>
+                        <input type="submit" class="btn btn-primary" onclick="javascript:closeRow();"
+                               value="Create tag"/>
+                    </td>
+                </form>
+            </tr>
+            <tr>
+                <td colspan="4"><a href="javascript:addTag();">Add new tag</a></td>
+            </tr>
+
+        </table>
+
+    </section>
+    <aside>
+    </aside>
+    <footer>
+    </footer>
+</div>
+{% endblock %}

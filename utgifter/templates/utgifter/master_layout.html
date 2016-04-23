@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <style type="text/css">
+        header, section, footer, aside, nav, article, figure, audio, video, canvas { display:block; }
+    </style>
+
+    <title> Utgifter - {%block pagetitle %}{% endblock %}</title>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'index' %}"><i class="glyphicon glyphicon-home"></i></a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'import_charges' %}">Import</a></li>
+        </ul>
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'charges' %}">Charges</a></li>
+        </ul>
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'matchers' %}">Matchers</a></li>
+        </ul>
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'tags' %}">Tags</a></li>
+        </ul>
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'sums' %}">Sums</a></li>
+        </ul>
+        <div class="navbar-brand navbar-right">
+            {% if request.user.is_superuser %}
+            Inloggad som <a href="{% url 'admin:index' %}">{{ request.user.username }}</a>
+            {% else %}
+            Inloggad som {{ request.user.username }}
+            {% endif %}
+            <a href="{% url 'user_logout' %}">
+                <i class="glyphicon glyphicon-log-out"></i>
+            </a>
+        </div>
+
+    </div>
+</nav>
+
+<div id="content">
+    <div id="body">
+        <h1>{% block title %}{% endblock %}</h1>
+
+        {% block body %}{% endblock %}
+    </div>
+    <div id="footer"></div>
+</div>
+</body>
+</html>

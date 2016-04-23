@@ -1,0 +1,239 @@
+{% extends 'utgifter/master_layout.html' %}
+
+{%  block pagetitle  %} Charges {% endblock %}
+
+{% block head %}
+<script type="text/javascript">
+    var lastClickedCharge = -1;
+    var selectedCharges = [];
+
+    $(document).ready(function() {
+        $(".tagListItem").click(function(e) {
+            if (lastClickedCharge != -1)
+                tagCharge(e);
+            else if (selectedCharges.length > 0)
+                tagCharges(e);
+        });
+
+        $(".setTagButton").click(function(e) {
+            var reg = /tagCharge(\d+)/;
+            var match = reg.exec(e.target.id);
+            if (match != null) {
+                lastClickedCharge = match[1];
+            }
+        });
+    });
+
+    function tagCharge(e) {
+        $("#setTagModal").modal("hide");
+
+        var reg = /tag(\d+)/;
+        var match = reg.exec(e.target.id);
+        if (match != null) {
+            $.post( "{% url 'charge_set_tag' %}", {"charge": lastClickedCharge, "tagid": match[1]},
+                function(data) {
+                    if (data.error) {
+                        alert(data.msg);
+                        return;
+                    }
+
+                    var tagButton = $("#tagCharge" + lastClickedCharge);
+                    tagButton.text("Edit");
+                    tagButton.parent().toggleClass("danger");
+                    var tdTag = tagButton.parent().siblings(".chargeTag");
+                    tdTag.css("background", data.tagcolor);
+                    tdTag.text(data.tagname);
+                    lastClickedCharge = -1;
+            });
+        }
+    }
+
+    function tagCharges(e) {
+        $("#setTagModal").modal("hide");
+
+        var reg = /tag(\d+)/;
+        var match = reg.exec(e.target.id);
+        if (match != null) {
+            var postdata = {"tagid": match[1]};
+            $.each(selectedCharges, function(k, v) {
+                postdata["charge"+k] = v;
+            });
+            $.post( "{% url 'charge_set_tag' %}", postdata,
+                function(data) {
+                    if (data.error) {
+                        alert(data.msg);
+                        return;
+                    }
+
+                    var checkedBoxes = $('input[type="checkbox"]:checked');
+                    var reg = /chargeBox(\d+)/;
+
+                    $.each(checkedBoxes, function(k, v) {
+                        var match = reg.exec(v.id);
+                        if (match != null) {
+                            var tagButton = $("#tagCharge" + match[1]);
+                            tagButton.text("Edit");
+                            tagButton.parent().toggleClass("danger");
+                            var tdTag = tagButton.parent().siblings(".chargeTag");
+                            tdTag.css("background", data.tagcolor);
+                            tdTag.text(data.tagname);
+                        }
+                    });
+                    selectedCharges = [];
+                    unselectAll();
+            });
+        }
+    }
+
+    function tagSelectedCharges() {
+        var checkedBoxes = $('input[type="checkbox"]:checked');
+
+        if (checkedBoxes.length <= 0) return;
+
+        var reg = /chargeBox(\d+)/;
+        selectedCharges = [];
+
+        $.each(checkedBoxes, function(k, v) {
+            var match = reg.exec(v.id);
+            if (match != null) {
+                selectedCharges.push(match[1]);
+            }
+        });
+
+        $("#setTagModal").modal("show");
+    }
+
+    function unselectAll() {
+        var checkedBoxes = $('input[type="checkbox"]:checked');
+        checkedBoxes.prop("checked", false);
+    }
+
+
+
+
+
+
+</script>
+{% endblock %}
+
+{% block body %}
+<div id="wrapper">
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <section id="content" class="col-md-10 col-md-offset-1">
+        <a href="{% url 'assign_charge_tags' %}">
+            <button class="btn btn-primary btn-sm">Assign tags</button>
+        </a>
+        <a href="{% url 'clear_charge_tags' %}">
+            <button class="btn btn-primary btn-sm">Clear tags</button>
+        </a>
+        <a href="{% url 'charges' %}">
+            <button class="btn btn-primary btn-sm">Show all</button>
+        </a>
+        <a href="{% url 'charges' 'tagged' %}">
+            <button class="btn btn-primary btn-sm">Show only tagged</button>
+        </a>
+        <a href="{% url 'charges' 'untagged' %}">
+            <button class="btn btn-primary btn-sm">Show only untagged</button>
+        </a>
+
+        <button class="btn btn-primary btn-sm pull-right tagSelectedButton" onclick="tagSelectedCharges();">
+            Tag selected...
+        </button>
+
+        <table class="table table-bordered table-condensed table-hover">
+            <tr>
+                <th>Date</th>
+                <th>Charge</th>
+                <th>Amount</th>
+                <th>Tag</th>
+                <th>Actions</th>
+            </tr>
+            {% for charge in charges %}
+            <tr>
+                <td class="chargeDate">{{ charge.date }}</td>
+                <td class="chargeName">{{ charge.name }}</td>
+                <td class="chargeAmount {%if charge.amount < 0 %}danger{% else %}success{% endif %}">
+                    {{ charge.amount }}
+                </td>
+                <td title="{% if charge.matcher %}Matched by {{ charge.matcher.name }}{% else %}Manually tagged {% endif %}"
+                    {% if charge.tag %} style="background: {{ charge.tag.color }}" {% endif %} class="chargeTag">
+                    {{ charge.tag|default:""}}
+                </td>
+                <td>
+                    <button type="button" id="tagCharge{{ charge.pk }}" class="btn btn-primary btn-xs setTagButton"
+                            data-toggle="modal" data-target="#setTagModal">
+                        {% if charge.tag %}Edit{% else %}Tag{% endif %}
+                    </button>
+                    {% if charge.tag %}
+                    <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
+                       class="btn btn-primary btn-xs unTagButton">
+                        Untag
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'charge_delete' charge.pk %}" id="deleteCharge{{ charge.pk }}"
+                       class="btn btn-primary btn-xs deleteTagButton">
+                        Delete
+                    </a>
+
+                    <div class="pull-right">
+                        <input id="chargeBox{{ charge.pk }}" class="chargeCheckBox" type="checkbox">
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+
+        <a href="{% url 'assign_charge_tags' %}">
+            <button class="btn btn-primary btn-sm">Assign tags</button>
+        </a>
+        <a href="{% url 'clear_charge_tags' %}">
+            <button class="btn btn-primary btn-sm">Clear tags</button>
+        </a>
+        <a href="{% url 'charges' %}">
+            <button class="btn btn-primary btn-sm">Show all</button>
+        </a>
+        <a href="{% url 'charges' 'tagged' %}">
+            <button class="btn btn-primary btn-sm">Show only tagged</button>
+        </a>
+        <a href="{% url 'charges' 'untagged' %}">
+            <button class="btn btn-primary btn-sm">Show only untagged</button>
+        </a>
+
+        <button class="btn btn-primary btn-sm pull-right tagSelectedButton" onclick="tagSelectedCharges();">
+            Tag selected...
+        </button>
+
+    </section>
+    <aside>
+    </aside>
+    <footer>
+    </footer>
+
+    <!-- Modal for adding a new tag -->
+    <div class="modal fade" id="setTagModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Set tag</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                        {% for tag in tags %}
+                        <a href="#" id="tag{{ tag.pk }}" class="list-group-item tagListItem"
+                           style="background: {{ tag.color }}">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

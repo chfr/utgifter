@@ -1,0 +1,30 @@
+{% extends 'utgifter/master_layout.html' %}
+
+{%  block pagetitle  %} Index {% endblock %}
+
+
+{% block body %}
+<div id="wrapper">
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <section id="content" class="col-md-8 col-md-offset-2">
+        <form action="{% url 'import_charges' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="import">Import charges</label>
+                <textarea name="raw_charges" class="form-control" rows="20" id="import"></textarea>
+
+                <input type="submit" class="btn btn-primary" value="Import">
+                <input name="autotag" id="autotag" type="checkbox">
+                <label for="autotag" class="control-label">Assign tags automatically</label>
+            </div>
+        </form>
+    </section>
+    <aside>
+    </aside>
+    <footer>
+    </footer>
+</div>
+{% endblock %}

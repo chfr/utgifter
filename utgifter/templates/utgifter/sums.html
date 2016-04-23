@@ -1,0 +1,34 @@
+{% extends 'utgifter/master_layout.html' %}
+
+{%  block pagetitle  %} Sums {% endblock %}
+
+
+{% block body %}
+<div id="wrapper">
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <section id="content" class="col-md-8 col-md-offset-2">
+        <table class="table table-bordered table-condensed table-hover">
+            <tr>
+                <th>    </th>
+                <th>Tag</th>
+                <th>Sum</th>
+            </tr>
+            {% for tag, sum in sums %}
+            <tr>
+                <td{% if tag.color %} style="background: {{ tag.color }};" {% endif %}></td>
+                <td>{{ tag }}</td>
+                <td>{{ sum }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </section>
+    <aside>
+    </aside>
+    <footer>
+    </footer>
+</div>
+{% endblock %}
