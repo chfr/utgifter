@@ -54,6 +54,7 @@ def charges(request, filter="all"):
 
     return render(request, 'utgifter/charges.html', context)
 
+
 @login_required
 @csrf_exempt
 def charge_set_tag(request):
@@ -97,13 +98,14 @@ def charge_set_tag(request):
             if not (tags and charges):
                 response = JsonResponse({"error": 1, "msg": "Tag or charges does not exist"})
             else:
+                tag = tags[0]
                 for charge in charges:
-                    tag = tags[0]
                     charge.tag = tag
                     charge.save()
                 response = JsonResponse({"success": 1, "tagname": tag.name, "tagcolor": tag.color})
 
     return response
+
 
 @login_required
 def charge_delete(request, charge_id):
@@ -112,6 +114,7 @@ def charge_delete(request, charge_id):
     charge.delete()
 
     return redirect("charges")
+
 
 @login_required
 def assign_charge_tags(request):
