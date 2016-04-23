@@ -14,35 +14,40 @@
     <section id="content" class="col-md-8 col-md-offset-2">
         <div class="row">
             <div class="text-center well col-md-6 col-md-offset-3">
-                <a href="{% url 'sums' prev_month.year prev_month.month %}/{{ display }}">
+                <a href="{% url 'stats' prev_month.year prev_month.month %}/{{ display }}">
                     <button class="btn btn-primary btn-sm pull-left">
                         <span class="glyphicon glyphicon-chevron-left"></span>
                         {{ prev_month.month|month_name }} {{ prev_month.year }}
                     </button>
                 </a>
                 <span>{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
-                <a href="{% url 'sums' next_month.year next_month.month %}/{{ display }}">
+                <a href="{% url 'stats' next_month.year next_month.month %}/{{ display }}">
                     <button class="btn btn-primary btn-sm pull-right">
                         {{ next_month.month|month_name }} {{ next_month.year }}
                         <span class="glyphicon glyphicon-chevron-right"></span></button>
                 </a>
             </div>
         </div>
-        <table class="table table-bordered table-condensed table-hover">
-            <tr>
-                <th></th>
-                <th>Tag</th>
-                <th>Sum</th>
-            </tr>
-            {% for tag, sum in sums %}
-            <tr>
-                <td {% if tag.color %} style="background: {{ tag.color }};" {% endif %}></td>
-                <td>{{ tag }}</td>
-                <td>{{ sum }}</td>
-            </tr>
-            {% endfor %}
+        {% for tag, sums in totals.items %}
+        <div class="well">
+            <h4>{{ tag }}</h4>
+            <table class="table table-bordered table-condensed table-hover">
+                <tr>
+                    <th>Month</th>
+                    <th>Sum</th>
+                </tr>
+                {% for sum in sums %}
+                {% if sum %}
+                <tr>
+                    <td>{{ forloop.counter|month_name }}</td>
+                    <td>{{ sum|default:"" }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
 
-        </table>
+            </table>
+        </div>
+        {% endfor %}
     </section>
     <aside>
     </aside>

@@ -320,27 +320,59 @@ def tags(request):
 
 
 @login_required
-def sums(request):
+def sums(request, year=0, month=0):
+    year, month = sanitize_date(year, month)
+
     tags = Tag.objects.filter(user=request.user)
-    user_charges = Charge.objects.filter(user=request.user)
+    user_charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month)
 
     sums = []
 
     for tag in tags:
         tagsum = user_charges.filter(tag=tag).aggregate(Sum("amount"))["amount__sum"]
-        sums.append((tag, tagsum))
+        sums.append((tag, tagsum if tagsum else 0))
 
     total_out = user_charges.filter(amount__lte=0).aggregate(Sum("amount"))["amount__sum"]
-    sums.append(("Total spent", total_out))
+    sums.append(("Total spent", total_out if total_out else 0))
     total_in = user_charges.filter(amount__gt=0).aggregate(Sum("amount"))["amount__sum"]
-    sums.append(("Total income", total_in))
+    sums.append(("Total income", total_in if total_in else 0))
     if total_out and total_in:
         sums.append(("Total delta", total_in + total_out))
+    else:
+        sums.append(("Total delta", 0))
 
     untagged_out = user_charges.filter(tag=None, amount__lte=0).aggregate(Sum("amount"))["amount__sum"]
-    sums.append(("Untagged expenses", untagged_out))
+    sums.append(("Untagged expenses", untagged_out if untagged_out else 0))
     untagged_in = user_charges.filter(tag=None, amount__gt=0).aggregate(Sum("amount"))["amount__sum"]
-    sums.append(("Untagged income", untagged_in))
+    sums.append(("Untagged income", untagged_in if untagged_in else 0))
 
-    context = {"sums": sums}
+    cur_month = date(year=year, month=month, day=15)
+    next_month = cur_month + timedelta(days=30)  # will this always work? let's hope!
+    prev_month = cur_month - timedelta(days=30)
+
+    context = {"sums": sums, "cur_month": cur_month, "prev_month": prev_month,
+               "next_month": next_month}
     return render(request, "utgifter/sums.html", context)
+
+
+def stats(request, year=0, month=0):
+    year, month = sanitize_date(year, month)
+
+    cur_month = date(year=year, month=month, day=15)
+    next_month = cur_month + timedelta(days=30)  # will this always work? let's hope!
+    prev_month = cur_month - timedelta(days=30)
+
+    tags = Tag.objects.filter(user=request.user)
+    charges = Charge.objects.filter(user=request.user)
+
+    totals = {}
+
+    for tag in tags:
+        for month in range(1, 13):
+            tagsum = charges.filter(tag=tag, date__year=2016, date__month=month).aggregate(Sum("amount"))["amount__sum"]
+            totals.setdefault(tag.name, []).append(tagsum)
+
+    print(totals)
+
+    context = {"cur_month": cur_month, "prev_month": prev_month, "next_month": next_month, "totals": totals}
+    return render(request, "utgifter/stats.html", context)

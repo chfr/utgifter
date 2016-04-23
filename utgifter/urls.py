@@ -36,4 +36,7 @@ urlpatterns = [
     url(r'^tags/edit/?$', views.edit_tag, name='edit_tag'),
     url(r'^tags/delete/(\d+)/?$', views.delete_tag, name='delete_tag'),
     url(r'^sums/?$', views.sums, name='sums'),
+    url(r'^sums/(?P<year>\d+)/(?P<month>\d+)/?$', views.sums, name='sums'),
+    url(r'^stats/?$', views.stats, name='stats'),
+    url(r'^stats/(?P<year>\d+)/(?P<month>\d+)/?$', views.stats, name='stats'),
 ]

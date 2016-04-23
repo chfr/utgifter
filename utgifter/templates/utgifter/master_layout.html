@@ -42,6 +42,10 @@
         <ul class="nav navbar-nav">
             <li><a href="{% url 'sums' %}">Sums</a></li>
         </ul>
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'stats' %}">Stats</a></li>
+        </ul>
+
         <div class="navbar-brand navbar-right">
             {% if request.user.is_superuser %}
             Inloggad som <a href="{% url 'admin:index' %}">{{ request.user.username }}</a>
