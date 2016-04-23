@@ -50,7 +50,6 @@
         }
 
         function showAddField(matcher) {
-            console.log("showing/hiding matcher" + matcher);
             var id = "#matcher" + matcher;
             var obj = $(id);
             if (obj.css('display') == 'none') {
@@ -63,7 +62,6 @@
 
         function addSearchString(matcher) {
             searchstring = $("#matcher"+matcher).val();
-            console.log(searchstring)
             $.post( "{% url 'matcher_add_searchstring' %}", {"string": searchstring, "matcher": matcher},
                 function( data ) {
                     window.location.replace("{% url 'matchers' %}");

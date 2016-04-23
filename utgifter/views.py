@@ -71,7 +71,6 @@ def charge_set_tag(request):
         return redirect("matchers")
 
     data = request.POST
-    print("data: " + str(data))
 
     response = JsonResponse({"error": 1, "msg": "Unknown error"})
 
@@ -371,8 +370,6 @@ def stats(request, year=0, month=0):
         for month in range(1, 13):
             tagsum = charges.filter(tag=tag, date__year=2016, date__month=month).aggregate(Sum("amount"))["amount__sum"]
             totals.setdefault(tag.name, []).append(tagsum)
-
-    print(totals)
 
     context = {"cur_month": cur_month, "prev_month": prev_month, "next_month": next_month, "totals": totals}
     return render(request, "utgifter/stats.html", context)
