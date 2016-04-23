@@ -83,7 +83,6 @@
 
             $("#addRow").hide();
         }
-
 </script>
 {% endblock %}
 {% block body %}
@@ -115,18 +114,23 @@
                         <li class="list-group-item">
                             {{ searchstring }}
                             <span class="badge badge-danger">
-                                <a href="{% url 'matcher_remove_searchstring' matcher.pk searchstring.pk %}">X</a></span>
+                                <a href="{% url 'matcher_remove_searchstring' matcher.pk searchstring.pk %}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </a>
+                            </span>
                         </li>
                         {% endfor %}
                     </ul>
 
-                    <button type="button" class="btn btn-primary btn-sm" onclick="showAddField({{ matcher.pk }})">Add
+                    <button type="button" class="btn btn-primary btn-sm" onclick="showAddField({{ matcher.pk }})">
+                        <span class="glyphicon glyphicon-plus"></span>
                     </button>
                     <input class="adderfield" id="matcher{{ matcher.pk }}" type="text"
                            style="display:none">
                 </td>
                 <td>
-                    <a href="{% url 'matcher_delete' matcher.pk %}" class="btn btn-primary btn-sm" onclick="">Delete
+                    <a href="{% url 'matcher_delete' matcher.pk %}" class="btn btn-primary btn-sm" onclick="">
+                        <span class="glyphicon glyphicon-trash"></span>
                     </a>
                 </td>
             </tr>
@@ -143,7 +147,7 @@
                     <td>{{ form.tag.errors }}
                         {{ form.tag }}
                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                                data-target="#addTagModal" id="addTagButton">Add tag
+                                data-target="#addTagModal" id="addTagButton">New tag
                         </button>
                     </td>
                     <td>{{ form.searchstrings.errors }}

@@ -24,6 +24,15 @@
                 lastClickedCharge = match[1];
             }
         });
+
+        $(".tdCharge").click(function(e) {
+            var reg = /tdCharge(\d+)/;
+            var match = reg.exec(e.target.id);
+            if (match != null) {
+                var checkBox = $("#chargeBox" + match[1]);
+                checkBox.prop("checked", !checkBox.prop("checked"));
+            }
+        });
     });
 
     function tagCharge(e) {
@@ -40,8 +49,7 @@
                     }
 
                     var tagButton = $("#tagCharge" + lastClickedCharge);
-                    tagButton.text("Edit");
-                    tagButton.parent().toggleClass("danger");
+                    tagButton.html('<span class="glyphicon glyphicon-pencil"></span>');
                     var tdTag = tagButton.parent().siblings(".chargeTag");
                     tdTag.css("background", data.tagcolor);
                     tdTag.text(data.tagname);
@@ -179,20 +187,24 @@
                         {% if charge.tag %} style="background: {{ charge.tag.color }}" {% endif %} class="chargeTag">
                         {{ charge.tag|default:""}}
                     </td>
-                    <td>
+                    <td class="tdCharge" id="tdCharge{{ charge.pk }}">
                         <button type="button" id="tagCharge{{ charge.pk }}" class="btn btn-primary btn-xs setTagButton"
                                 data-toggle="modal" data-target="#setTagModal">
-                            {% if charge.tag %}Edit{% else %}Tag{% endif %}
+                            {% if charge.tag %}
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-tag"></span>
+                            {% endif %}
                         </button>
                         {% if charge.tag %}
                         <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
                            class="btn btn-primary btn-xs unTagButton">
-                            Untag
+                            <span class="glyphicon glyphicon-remove"></span>
                         </a>
                         {% endif %}
                         <a href="{% url 'charge_delete' charge.pk %}" id="deleteCharge{{ charge.pk }}"
                            class="btn btn-primary btn-xs deleteTagButton">
-                            Delete
+                            <span class="glyphicon glyphicon-trash"></span>
                         </a>
 
                         <div class="pull-right">

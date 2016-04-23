@@ -44,14 +44,13 @@
             resetEdit();
 
         editing = true;
-        $(this).text("Cancel");
+        $(this).html('<span class="glyphicon glyphicon-remove"></span>');
 
         var row = match[1];
         var tagid = match[2];
-        console.log("editing row " + row + " with tag id " + tagid);
 
         var td = $(this).parent();
-        td.prepend('<button id="save" class="btn btn-primary btn-sm">Save</button>');
+        td.prepend('<button id="save" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-floppy-disk"></span></button>');
 
         var tr = td.parent();
         var name = tr.find(".name");
@@ -80,12 +79,11 @@
     }
 
     function resetEdit() {
-        console.log("resetting edit");
         removeColorListener();
 
         var editButton = $(".editButton");
         editing = false;
-        editButton.text("Edit");
+        editButton.html('<span class="glyphicon glyphicon-pencil"></span>');
         var td = editButton.parent();
 
         td.find("#save").remove();
@@ -101,8 +99,6 @@
     }
 
     function editTag(tagid, name, color) {
-        console.log("changing tag " + tagid + " to " + name + " with col " + color);
-
         $.post( "{% url 'edit_tag' %}", {"tagid": tagid, "name": name, "color": color},
                 function( data ) {
                     if (data.error) {
@@ -149,8 +145,12 @@
                 <td class="name">{{ tag.name }}</td>
                 <td class="color" style="background: {{ tag.color }}">{{ tag.color }}</td>
                 <td>
-                    <button id="edit{{ forloop.counter0 }}_{{ tag.pk }}" class="editButton btn btn-primary btn-sm">Edit</button>
-                    <a href="{% url 'delete_tag' tag.pk %}" class="btn btn-primary btn-sm">Delete</a>
+                    <button id="edit{{ forloop.counter0 }}_{{ tag.pk }}" class="editButton btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                    <a href="{% url 'delete_tag' tag.pk %}" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </a>
                 </td>
             </tr>
             {% endfor %}
