@@ -1,6 +1,7 @@
 
 *.sqlite3
 .idea
+www/
 
 # GitHub Python .gitignore below
 
