@@ -1,5 +1,7 @@
 {% extends 'utgifter/master_layout.html' %}
 
+{% load tags %}
+
 {%  block pagetitle  %} Charges {% endblock %}
 
 {% block head %}
@@ -107,12 +109,6 @@
         var checkedBoxes = $('input[type="checkbox"]:checked');
         checkedBoxes.prop("checked", false);
     }
-
-
-
-
-
-
 </script>
 {% endblock %}
 
@@ -122,91 +118,132 @@
     </header>
     <nav>
     </nav>
-    <section id="content" class="col-md-10 col-md-offset-1">
-        <a href="{% url 'assign_charge_tags' %}">
-            <button class="btn btn-primary btn-sm">Assign tags</button>
-        </a>
-        <a href="{% url 'clear_charge_tags' %}">
-            <button class="btn btn-primary btn-sm">Clear tags</button>
-        </a>
-        <a href="{% url 'charges' %}">
-            <button class="btn btn-primary btn-sm">Show all</button>
-        </a>
-        <a href="{% url 'charges' 'tagged' %}">
-            <button class="btn btn-primary btn-sm">Show only tagged</button>
-        </a>
-        <a href="{% url 'charges' 'untagged' %}">
-            <button class="btn btn-primary btn-sm">Show only untagged</button>
-        </a>
+    <section id="content">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="row">
+                <div class="text-center well col-md-6 col-md-offset-3">
+                    <a href="{% url 'charges' prev_month.year prev_month.month %}/{{ display }}">
+                        <button class="btn btn-primary btn-sm pull-left">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                            {{ prev_month.month|month_name }} {{ prev_month.year }}
+                        </button>
+                    </a>
+                    <span>{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
+                    <a href="{% url 'charges' next_month.year next_month.month %}/{{ display }}">
+                        <button class="btn btn-primary btn-sm pull-right">
+                            {{ next_month.month|month_name }} {{ next_month.year }}
+                            <span class="glyphicon glyphicon-chevron-right"></span></button>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="{% url 'assign_charge_tags' %}">
+                        <button class="btn btn-primary btn-sm">Assign tags</button>
+                    </a>
+                    <a href="{% url 'clear_charge_tags' %}">
+                        <button class="btn btn-primary btn-sm">Clear tags</button>
+                    </a>
+                    <a href="{% url 'charges' cur_month.year cur_month.month %}">
+                        <button class="btn btn-primary btn-sm">Show all</button>
+                    </a>
+                    <a href="{% url 'charges' cur_month.year cur_month.month 'tagged' %}">
+                        <button class="btn btn-primary btn-sm">Show only tagged</button>
+                    </a>
+                    <a href="{% url 'charges' cur_month.year cur_month.month 'untagged' %}">
+                        <button class="btn btn-primary btn-sm">Show only untagged</button>
+                    </a>
 
-        <button class="btn btn-primary btn-sm pull-right tagSelectedButton" onclick="tagSelectedCharges();">
-            Tag selected...
-        </button>
-
-        <table class="table table-bordered table-condensed table-hover">
-            <tr>
-                <th>Date</th>
-                <th>Charge</th>
-                <th>Amount</th>
-                <th>Tag</th>
-                <th>Actions</th>
-            </tr>
-            {% for charge in charges %}
-            <tr>
-                <td class="chargeDate">{{ charge.date }}</td>
-                <td class="chargeName">{{ charge.name }}</td>
-                <td class="chargeAmount {%if charge.amount < 0 %}danger{% else %}success{% endif %}">
-                    {{ charge.amount }}
-                </td>
-                <td title="{% if charge.matcher %}Matched by {{ charge.matcher.name }}{% else %}Manually tagged {% endif %}"
-                    {% if charge.tag %} style="background: {{ charge.tag.color }}" {% endif %} class="chargeTag">
-                    {{ charge.tag|default:""}}
-                </td>
-                <td>
-                    <button type="button" id="tagCharge{{ charge.pk }}" class="btn btn-primary btn-xs setTagButton"
-                            data-toggle="modal" data-target="#setTagModal">
-                        {% if charge.tag %}Edit{% else %}Tag{% endif %}
+                    <button class="btn btn-primary btn-sm pull-right tagSelectedButton" onclick="tagSelectedCharges();">
+                        Tag selected...
                     </button>
-                    {% if charge.tag %}
-                    <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
-                       class="btn btn-primary btn-xs unTagButton">
-                        Untag
+                </div>
+            </div>
+
+            <table class="table table-bordered table-condensed table-hover">
+                <tr>
+                    <th>Date</th>
+                    <th>Charge</th>
+                    <th>Amount</th>
+                    <th>Tag</th>
+                    <th>Actions</th>
+                </tr>
+                {% for charge in charges %}
+                <tr>
+                    <td class="chargeDate">{{ charge.date }}</td>
+                    <td class="chargeName">{{ charge.name }}</td>
+                    <td class="chargeAmount {%if charge.amount < 0 %}danger{% else %}success{% endif %}">
+                        {{ charge.amount }}
+                    </td>
+                    <td title="{% if charge.matcher %}Matched by {{ charge.matcher.name }}{% else %}Manually tagged {% endif %}"
+                        {% if charge.tag %} style="background: {{ charge.tag.color }}" {% endif %} class="chargeTag">
+                        {{ charge.tag|default:""}}
+                    </td>
+                    <td>
+                        <button type="button" id="tagCharge{{ charge.pk }}" class="btn btn-primary btn-xs setTagButton"
+                                data-toggle="modal" data-target="#setTagModal">
+                            {% if charge.tag %}Edit{% else %}Tag{% endif %}
+                        </button>
+                        {% if charge.tag %}
+                        <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
+                           class="btn btn-primary btn-xs unTagButton">
+                            Untag
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'charge_delete' charge.pk %}" id="deleteCharge{{ charge.pk }}"
+                           class="btn btn-primary btn-xs deleteTagButton">
+                            Delete
+                        </a>
+
+                        <div class="pull-right">
+                            <input id="chargeBox{{ charge.pk }}" class="chargeCheckBox" type="checkbox">
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </table>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="{% url 'assign_charge_tags' %}">
+                        <button class="btn btn-primary btn-sm">Assign tags</button>
                     </a>
-                    {% endif %}
-                    <a href="{% url 'charge_delete' charge.pk %}" id="deleteCharge{{ charge.pk }}"
-                       class="btn btn-primary btn-xs deleteTagButton">
-                        Delete
+                    <a href="{% url 'clear_charge_tags' %}">
+                        <button class="btn btn-primary btn-sm">Clear tags</button>
+                    </a>
+                    <a href="{% url 'charges' cur_month.year cur_month.month %}">
+                        <button class="btn btn-primary btn-sm">Show all</button>
+                    </a>
+                    <a href="{% url 'charges' cur_month.year cur_month.month 'tagged' %}">
+                        <button class="btn btn-primary btn-sm">Show only tagged</button>
+                    </a>
+                    <a href="{% url 'charges' cur_month.year cur_month.month 'untagged' %}">
+                        <button class="btn btn-primary btn-sm">Show only untagged</button>
                     </a>
 
-                    <div class="pull-right">
-                        <input id="chargeBox{{ charge.pk }}" class="chargeCheckBox" type="checkbox">
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-
-        </table>
-
-        <a href="{% url 'assign_charge_tags' %}">
-            <button class="btn btn-primary btn-sm">Assign tags</button>
-        </a>
-        <a href="{% url 'clear_charge_tags' %}">
-            <button class="btn btn-primary btn-sm">Clear tags</button>
-        </a>
-        <a href="{% url 'charges' %}">
-            <button class="btn btn-primary btn-sm">Show all</button>
-        </a>
-        <a href="{% url 'charges' 'tagged' %}">
-            <button class="btn btn-primary btn-sm">Show only tagged</button>
-        </a>
-        <a href="{% url 'charges' 'untagged' %}">
-            <button class="btn btn-primary btn-sm">Show only untagged</button>
-        </a>
-
-        <button class="btn btn-primary btn-sm pull-right tagSelectedButton" onclick="tagSelectedCharges();">
-            Tag selected...
-        </button>
-
+                    <button class="btn btn-primary btn-sm pull-right tagSelectedButton" onclick="tagSelectedCharges();">
+                        Tag selected...
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="text-center well col-md-6 col-md-offset-3">
+                    <a href="{% url 'charges' prev_month.year prev_month.month %}/{{ display }}">
+                        <button class="btn btn-primary btn-sm pull-left">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                            {{ prev_month.month|month_name }} {{ prev_month.year }}
+                        </button>
+                    </a>
+                    <span>{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
+                    <a href="{% url 'charges' next_month.year next_month.month %}/{{ display }}">
+                        <button class="btn btn-primary btn-sm pull-right">
+                            {{ next_month.month|month_name }} {{ next_month.year }}
+                            <span class="glyphicon glyphicon-chevron-right"></span></button>
+                    </a>
+                </div>
+            </div>
+        </div>
     </section>
     <aside>
     </aside>

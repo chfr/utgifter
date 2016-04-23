@@ -18,7 +18,9 @@ urlpatterns = [
 
     url(r'^import/?$', views.import_charges, name='import_charges'),
     url(r'^charges/?$', views.charges, name='charges'),
-    url(r'^charges/(?P<filter>all|tagged|untagged)/?$', views.charges, name='charges'),
+    url(r'^charges/(?P<year>\d+)/(?P<month>\d+)/?$', views.charges, name='charges'),
+    url(r'^charges/(?P<display>all|tagged|untagged)/?$', views.charges, name='charges'),
+    url(r'^charges/(?P<year>\d+)/(?P<month>\d+)/(?P<display>all|tagged|untagged)/?$', views.charges, name='charges'),
     url(r'^charges/assign/?$', views.assign_charge_tags, name="assign_charge_tags"),
     url(r'^charges/clear/?$', views.clear_charge_tags, name="clear_charge_tags"),
     url(r'^charge/set/?$', views.charge_set_tag, name="charge_set_tag"),

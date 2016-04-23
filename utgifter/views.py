@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import JsonResponse
@@ -7,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .charge_parser import parse_nordea
 from .forms import TagForm, MatcherForm
 from .models import Charge, Matcher, Tag, SearchString
+from .utils import sanitize_date
 
 
 @login_required
@@ -41,16 +44,22 @@ def import_charges(request):
 
 
 @login_required
-def charges(request, filter="all"):
-    charges = Charge.objects.filter(user=request.user).order_by("date")
-    if filter == "tagged":
+def charges(request, display="all", year=0, month=0):
+    year, month = sanitize_date(year, month)
+    charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month).order_by("date")
+    if display == "tagged":
         charges = charges.exclude(tag=None)
-    elif filter == "untagged":
+    elif display == "untagged":
         charges = charges.filter(tag=None)
 
     tags = Tag.objects.filter(user=request.user)
 
-    context = {"charges": charges, "tags": tags}
+    cur_month = date(year=year, month=month, day=15)
+    next_month = cur_month + timedelta(days=30)  # will this always work? let's hope!
+    prev_month = cur_month - timedelta(days=30)
+
+    context = {"charges": charges, "tags": tags, "cur_month": cur_month, "prev_month": prev_month,
+               "next_month": next_month, "display": display}
 
     return render(request, 'utgifter/charges.html', context)
 
