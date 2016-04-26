@@ -50,11 +50,8 @@
                         return;
                     }
 
-                    var tagButton = $("#tagCharge" + lastClickedCharge);
-                    tagButton.html('<span class="glyphicon glyphicon-pencil"></span>');
-                    var tdTag = tagButton.parent().siblings(".chargeTag");
-                    tdTag.css("background", data.tagcolor);
-                    tdTag.text(data.tagname);
+                    tagChargeId(lastClickedCharge, data.tagname, data.tagcolor);
+
                     lastClickedCharge = -1;
             });
         }
@@ -83,18 +80,22 @@
                     $.each(checkedBoxes, function(k, v) {
                         var match = reg.exec(v.id);
                         if (match != null) {
-                            var tagButton = $("#tagCharge" + match[1]);
-                            tagButton.text("Edit");
-                            tagButton.parent().toggleClass("danger");
-                            var tdTag = tagButton.parent().siblings(".chargeTag");
-                            tdTag.css("background", data.tagcolor);
-                            tdTag.text(data.tagname);
+                            tagChargeId(match[1], data.tagname, data.tagcolor);
                         }
                     });
                     selectedCharges = [];
                     unselectAll();
             });
         }
+    }
+
+    function tagChargeId(chargeId, tagname, tagcolor) {
+        var tagButton = $("#tagCharge" + chargeId);
+        tagButton.html('<span class="glyphicon glyphicon-pencil"></span>');
+        $("#untagCharge" + chargeId).show();
+        var tdTag = tagButton.parent().siblings(".chargeTag");
+        tdTag.css("background", tagcolor);
+        tdTag.text(tagname);
     }
 
     function tagSelectedCharges() {
@@ -198,12 +199,13 @@
                             <span class="glyphicon glyphicon-tag"></span>
                             {% endif %}
                         </button>
-                        {% if charge.tag %}
+
                         <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
-                           class="btn btn-primary btn-xs unTagButton">
+                           class="btn btn-primary btn-xs unTagButton" {% if not charge.tag %} style="display:none;" {%
+                           endif %}>
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
-                        {% endif %}
+
                         <a href="{% url 'charge_delete' charge.pk %}" id="deleteCharge{{ charge.pk }}"
                            class="btn btn-primary btn-xs deleteTagButton">
                             <span class="glyphicon glyphicon-trash"></span>
