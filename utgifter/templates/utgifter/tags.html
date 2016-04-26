@@ -17,18 +17,29 @@
     function setColorListener() {
         var color = $("#color_input");
         var reg = /#[A-Fa-f0-9]{6}/;
-        color.on("input", function() {
-            var col = color.val();
+
+        updateColor = function() {
+            colorField = $(this);
+            var col = colorField.val();
+
+            //var col = color.val();
             var match = reg.exec(col);
             if (match != null) {
-                color.parent().removeAttr("style");
-                color.parent().css("background", col);
+                console.log("col: " + col);
+                colorField.parent().removeAttr("style");
+                colorField.parent().css("background", col);
             }
-        });
+        };
+
+        color.on("input", updateColor);
+        color = $("#id_color");
+        color.on("input", updateColor);
     }
 
     function removeColorListener() {
         var color = $("#color_input");
+        color.unbind("input");
+        color = $("#id_color");
         color.unbind("input");
     }
 
