@@ -6,6 +6,8 @@
 <script type="text/javascript">
     var unsavedRow = false;
     var editing = false;
+    var editingRow = -1;
+    var editingTag = -1;
 
     var old_name = null;
     var old_color = null;
@@ -25,7 +27,6 @@
             //var col = color.val();
             var match = reg.exec(col);
             if (match != null) {
-                console.log("col: " + col);
                 colorField.parent().removeAttr("style");
                 colorField.parent().css("background", col);
             }
@@ -48,17 +49,22 @@
         var match = reg.exec(this.id);
         if (!match) return;
 
-        $(this).unbind("click");
-        $(this).click(resetEdit);
+        var row = match[1];
+        var tagid = match[2];
 
         if (editing)
-            resetEdit();
+            resetEdit(editingRow, editingTag);
+
+        $(this).off("click");
+        $(this).click(function() {
+            resetEdit(row, tagid);
+        });
+
+        editingRow = row;
+        editingTag = tagid;
 
         editing = true;
         $(this).html('<span class="glyphicon glyphicon-remove"></span>');
-
-        var row = match[1];
-        var tagid = match[2];
 
         var td = $(this).parent();
         td.prepend('<button id="save" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-floppy-disk"></span></button>');
@@ -89,23 +95,25 @@
         setColorListener();
     }
 
-    function resetEdit() {
+    function resetEdit(row, tagid) {
         removeColorListener();
 
-        var editButton = $(".editButton");
+        var editButton = $("#edit" + row + "_" + tagid);
         editing = false;
         editButton.html('<span class="glyphicon glyphicon-pencil"></span>');
         var td = editButton.parent();
-
         td.find("#save").remove();
 
-        var tr = td.parent();
-        var name = tr.find(".name");
+        var name = $("#name" + row);
         name.html(old_name);
 
-        var color = tr.find(".color");
+        var color = $("#color" + row);
         color.html(old_color);
 
+        editingRow = -1;
+        editingTag = -1;
+
+        $(".editButton").off("click");
         $(".editButton").click(setupEdit);
     }
 
@@ -152,9 +160,10 @@
                 <th>Actions</th>
             </tr>
             {% for tag in tags %}
-            <tr>
-                <td class="name">{{ tag.name }}</td>
-                <td class="color" style="background: {{ tag.color }}">{{ tag.color }}</td>
+            <tr id="row{{ forloop.counter0 }}">
+                <td id="name{{ forloop.counter0 }}" class="name">{{ tag.name }}</td>
+                <td id="color{{ forloop.counter0 }}" class="color" style="background: {{ tag.color }}">{{ tag.color }}
+                </td>
                 <td>
                     <button id="edit{{ forloop.counter0 }}_{{ tag.pk }}" class="editButton btn btn-primary btn-sm">
                         <span class="glyphicon glyphicon-pencil"></span>
