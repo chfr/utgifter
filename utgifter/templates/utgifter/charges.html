@@ -139,7 +139,7 @@
                             {{ prev_month.month|month_name }} {{ prev_month.year }}
                         </button>
                     </a>
-                    <span>{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
+                    <span class="h3">{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
                     <a href="{% url 'charges' next_month.year next_month.month %}/{{ display }}">
                         <button class="btn btn-primary btn-sm pull-right">
                             {{ next_month.month|month_name }} {{ next_month.year }}
@@ -201,8 +201,8 @@
                         </button>
 
                         <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
-                           class="btn btn-primary btn-xs unTagButton" {% if not charge.tag %} style="display:none;" {%
-                           endif %}>
+                           class="btn btn-primary btn-xs unTagButton" {% if not charge.tag %} style="display:none;"
+                           {% endif %}>
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
 
