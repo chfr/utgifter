@@ -25,6 +25,8 @@
             }
         });
 
+        /* When a button/checkbox in the row is clicked, this tr click listener also fires.
+           Makes the buttons/checkboxes behave in the wrong way, I'll fix it later.
         $(".trCharge").click(function(e) {
             var reg = /trCharge(\d+)/;
             var match = reg.exec($(this).closest("tr").attr('id'));
@@ -32,7 +34,7 @@
                 var checkBox = $("#chargeBox" + match[1]);
                 checkBox.prop("checked", !checkBox.prop("checked"));
             }
-        });
+        });*/
     });
 
     function tagCharge(e) {
