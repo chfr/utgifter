@@ -367,9 +367,16 @@ def stats(request, year=0, month=0):
     totals = {}
 
     for tag in tags:
+        prev = None
         for month in range(1, 13):
             tagsum = charges.filter(tag=tag, date__year=2016, date__month=month).aggregate(Sum("amount"))["amount__sum"]
-            totals.setdefault(tag.name, []).append(tagsum)
+            if prev is None:
+                delta = 0
+                prev = tagsum
+            if not tagsum is None:
+                delta = prev - tagsum
+                prev = tagsum
+            totals.setdefault(tag.name, []).append((tagsum, delta))
 
     context = {"cur_month": cur_month, "prev_month": prev_month, "next_month": next_month, "totals": totals}
     return render(request, "utgifter/stats.html", context)

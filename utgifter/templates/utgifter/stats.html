@@ -35,12 +35,22 @@
                 <tr>
                     <th>Month</th>
                     <th>Sum</th>
+                    <th>Delta</th>
                 </tr>
-                {% for sum in sums %}
+                {% for sum, delta in sums %}
                 {% if sum %}
                 <tr>
                     <td>{{ forloop.counter|month_name }}</td>
                     <td>{{ sum|default:"" }}</td>
+                    {% if delta and delta < 0 %}
+                    <td class="success">
+                        {% elif delta and delta > 0 %}
+                    <td class="danger">
+                        {% else %}
+                    <td>
+                        {% endif %}
+                        {{ delta|default:"" }}
+                    </td>
                 </tr>
                 {% endif %}
                 {% endfor %}
