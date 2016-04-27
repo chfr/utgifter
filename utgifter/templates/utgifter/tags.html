@@ -79,7 +79,7 @@
 
         var color = tr.find(".color");
         old_color = color.html();
-        color.html('<input id="color_input" class="inputs" type="text" value="' + color.text() + '">');
+        color.html('<input id="color_input" class="inputs" maxlength="7" name="color" type="color" value="' + color.text() + '"/>');
         var color_input = color.children()[0];
 
         $(".inputs").keypress(function(e) {
