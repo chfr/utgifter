@@ -142,6 +142,7 @@
 
         $("#addRow").hide();
     }
+
 </script>
 {% endblock %}
 {% block body %}
@@ -162,8 +163,7 @@
             {% for tag in tags %}
             <tr id="row{{ forloop.counter0 }}">
                 <td id="name{{ forloop.counter0 }}" class="name">{{ tag.name }}</td>
-                <td id="color{{ forloop.counter0 }}" class="color" style="background: {{ tag.color }}">{{ tag.color }}
-                </td>
+                <td id="color{{ forloop.counter0 }}" class="color" style="background: {{ tag.color }}">{{ tag.color }}</td>
                 <td>
                     <button id="edit{{ forloop.counter0 }}_{{ tag.pk }}" class="editButton btn btn-primary btn-sm">
                         <span class="glyphicon glyphicon-pencil"></span>
