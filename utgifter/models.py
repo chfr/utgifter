@@ -1,3 +1,4 @@
+from colorful.fields import RGBColorField
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -21,7 +22,7 @@ class Charge(models.Model):
 
 class Tag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    color = models.CharField(max_length=10, default="#b9d8e7")
+    color = RGBColorField(default="#b9d8e7")
     name = models.CharField(max_length=50)
 
     def __str__(self):
