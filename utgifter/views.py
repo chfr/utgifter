@@ -353,7 +353,7 @@ def sums(request, year=0, month=0):
                "next_month": next_month}
     return render(request, "utgifter/sums.html", context)
 
-
+@login_required
 def stats(request, year=0, month=0):
     year, month = sanitize_date(year, month)
 
@@ -370,6 +370,7 @@ def stats(request, year=0, month=0):
         prev = None
         for month in range(1, 13):
             tagsum = charges.filter(tag=tag, date__year=2016, date__month=month).aggregate(Sum("amount"))["amount__sum"]
+            delta = 0
             if prev is None:
                 delta = 0
                 prev = tagsum
