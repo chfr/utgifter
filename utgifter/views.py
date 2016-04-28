@@ -237,7 +237,7 @@ def matchers(request):
             form.save_m2m()
 
             searchstrings = form.cleaned_data["searchstrings"]
-            for searchstring in searchstrings.split("\n"):
+            for searchstring in searchstrings.splitlines():
                 if not searchstring.strip():
                     continue  # whitespace/empty not allowed
 
