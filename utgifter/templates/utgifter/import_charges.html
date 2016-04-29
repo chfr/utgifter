@@ -10,15 +10,24 @@
     <nav>
     </nav>
     <section id="content" class="col-md-8 col-md-offset-2">
-        <form action="{% url 'import_charges' %}" method="POST">
+        <form action="{% url 'import_data' %}" method="POST">
             {% csrf_token %}
             <div class="form-group">
-                <label for="import">Import charges</label>
-                <textarea name="raw_charges" class="form-control" rows="20" id="import"></textarea>
+                <label for="import_charges">Import charges</label>
+                <textarea name="raw_charges" class="form-control" rows="15" id="import_charges"></textarea>
 
                 <input type="submit" class="btn btn-primary" value="Import">
                 <input name="autotag" id="autotag" type="checkbox">
                 <label for="autotag" class="control-label">Assign tags automatically</label>
+            </div>
+        </form>
+        <form action="{% url 'import_data' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="import_data">Import JSON data (tags, matchers and search strings)</label>
+                <textarea name="json_data" class="form-control" rows="15" id="import_data"></textarea>
+
+                <input type="submit" class="btn btn-primary" value="Import">
             </div>
         </form>
     </section>

@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .charge_parser import parse_nordea
 from .forms import TagForm, MatcherForm
 from .models import Charge, Matcher, Tag, SearchString
-from .utils import sanitize_date
+from .utils import sanitize_date, dump_data_to_json, load_data_from_json
 
 
 @login_required
@@ -20,60 +20,38 @@ def index(request):
 
 
 @login_required
-def import_charges(request):
+def import_data(request):
     context = {}
     charges = []
     do_tagging = False
 
     if request.method == "POST":
-        if "autotag" in request.POST:
-            if request.POST["autotag"] == "on":
-                do_tagging = True
+        if "raw_charges" in request.POST and not "json_data" in request.POST:
+            if "autotag" in request.POST:
+                if request.POST["autotag"] == "on":
+                    do_tagging = True
 
-        for row in parse_nordea(request.POST["raw_charges"]):
-            row["user"] = request.user
-            charges.append(Charge(**row))
+            for row in parse_nordea(request.POST["raw_charges"]):
+                row["user"] = request.user
+                charges.append(Charge(**row))
 
-        Charge.objects.bulk_create(charges)
+            Charge.objects.bulk_create(charges)
 
-        if do_tagging:
-            return redirect("assign_charge_tags")
-        else:
-            return redirect("charges")
+            if do_tagging:
+                return redirect("assign_charge_tags")
+            else:
+                return redirect("charges")
+        elif "raw_charges" not in request.POST and "json_data" in request.POST:
+            load_data_from_json(request.user, json.loads(request.POST["json_data"]))
 
     return render(request, "utgifter/import_charges.html", context)
 
 
 @login_required
 def export_data(request):
-    data = []
+    json_data = dump_data_to_json(request.user)
 
-    tags = Tag.objects.filter(user=request.user)
-
-    for tag in tags:
-        d = {}
-        d["name"] = tag.name
-        d["color"] = tag.color
-        matchers = Matcher.objects.filter(user=request.user, tag=tag)
-        matcher_list = []
-        for matcher in matchers:
-            matcher_data = {}
-            matcher_data["name"] = matcher.name
-            matcher_data["method"] = matcher.method
-
-            searchstrings = SearchString.objects.filter(user=request.user, matcher=matcher)
-            l = []
-            for searchstring in searchstrings:
-                l.append(searchstring.string)
-
-            matcher_data["searchstrings"] = l
-            matcher_list.append(matcher_data)
-
-        d["matchers"] = matcher_list
-
-        data.append(d)
-
-    context = {"json_data": json.dumps(data, indent=2)}
+    context = {"json_data": json_data}
     return render(request, "utgifter/export_data.html", context)
 
 

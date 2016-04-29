@@ -28,7 +28,10 @@
             <a class="navbar-brand" href="{% url 'index' %}"><i class="glyphicon glyphicon-home"></i></a>
         </div>
         <ul class="nav navbar-nav">
-            <li><a href="{% url 'import_charges' %}">Import</a></li>
+            <li><a href="{% url 'import_data' %}">Import</a></li>
+        </ul>
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'export_data' %}">Export</a></li>
         </ul>
         <ul class="nav navbar-nav">
             <li><a href="{% url 'charges' %}">Charges</a></li>
