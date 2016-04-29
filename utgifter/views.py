@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -41,6 +42,39 @@ def import_charges(request):
             return redirect("charges")
 
     return render(request, "utgifter/import_charges.html", context)
+
+
+@login_required
+def export_data(request):
+    data = []
+
+    tags = Tag.objects.filter(user=request.user)
+
+    for tag in tags:
+        d = {}
+        d["name"] = tag.name
+        d["color"] = tag.color
+        matchers = Matcher.objects.filter(user=request.user, tag=tag)
+        matcher_list = []
+        for matcher in matchers:
+            matcher_data = {}
+            matcher_data["name"] = matcher.name
+            matcher_data["method"] = matcher.method
+
+            searchstrings = SearchString.objects.filter(user=request.user, matcher=matcher)
+            l = []
+            for searchstring in searchstrings:
+                l.append(searchstring.string)
+
+            matcher_data["searchstrings"] = l
+            matcher_list.append(matcher_data)
+
+        d["matchers"] = matcher_list
+
+        data.append(d)
+
+    context = {"json_data": json.dumps(data, indent=2)}
+    return render(request, "utgifter/export_data.html", context)
 
 
 @login_required
@@ -352,6 +386,7 @@ def sums(request, year=0, month=0):
     context = {"sums": sums, "cur_month": cur_month, "prev_month": prev_month,
                "next_month": next_month}
     return render(request, "utgifter/sums.html", context)
+
 
 @login_required
 def stats(request, year=0, month=0):

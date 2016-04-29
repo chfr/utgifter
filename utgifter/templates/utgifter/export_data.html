@@ -1,0 +1,37 @@
+{% extends 'utgifter/master_layout.html' %}
+
+{%  block pagetitle  %} Export data {% endblock %}
+
+{% block head %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#select_all_btn").click(function(e) {
+            $("#data_field").select();
+        });
+    });
+
+</script>
+{% endblock %}
+
+{% block body %}
+<div id="wrapper">
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <section id="content" class="col-md-8 col-md-offset-2">
+        <div id="data_container">
+            <label for="data_field">Data</label><br/>
+            <textarea id="data_field" cols="120" rows="25" readonly="readonly">{{ json_data }}</textarea><br/>
+        </div>
+        <div id="button_container">
+            <button id="select_all_btn" class="btn btn-primary">Select all</button>
+            <button id="copy_btn" class="btn btn-primary">Copy to clipboard</button>
+        </div>
+    </section>
+    <aside>
+    </aside>
+    <footer>
+    </footer>
+</div>
+{% endblock %}

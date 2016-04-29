@@ -17,6 +17,7 @@ urlpatterns = [
     url('^reset/done/$', auth_views.password_reset_complete, name='user_password_reset_complete'),
 
     url(r'^import/?$', views.import_charges, name='import_charges'),
+    url(r'^export/?$', views.export_data, name='export_data'),
     url(r'^charges/?$', views.charges, name='charges'),
     url(r'^charges/(?P<year>\d+)/(?P<month>\d+)/?$', views.charges, name='charges'),
     url(r'^charges/(?P<display>all|tagged|untagged)/?$', views.charges, name='charges'),
