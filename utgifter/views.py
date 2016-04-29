@@ -70,8 +70,12 @@ def charges(request, display="all", year=0, month=0):
     next_month = cur_month + timedelta(days=30)  # will this always work? let's hope!
     prev_month = cur_month - timedelta(days=30)
 
+    months = []
+    for i in range(1, 13):
+        months.append({"num": i, "cur": i == cur_month.month})
+
     context = {"charges": charges, "tags": tags, "cur_month": cur_month, "prev_month": prev_month,
-               "next_month": next_month, "display": display}
+               "next_month": next_month, "display": display, "months": months, "year": year}
 
     return render(request, 'utgifter/charges.html', context)
 

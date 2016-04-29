@@ -9,3 +9,8 @@ register = template.Library()
 def month_name(month):
     d = date(2016, month, 1)
     return d.strftime("%B")
+
+
+@register.filter
+def month_name_short(month):
+    return month_name(month)[:3]
