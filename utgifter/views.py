@@ -1,5 +1,5 @@
-from datetime import date, timedelta
 import json
+from datetime import date, timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -16,6 +16,35 @@ from .utils import sanitize_date, dump_data_to_json, load_data_from_json
 @login_required
 def index(request):
     context = {}
+    year, month = sanitize_date(-1, -1)
+    now = date(year=year, month=month, day=15)
+    prev = now - timedelta(days=30)
+    user_charges = Charge.objects.filter(user=request.user)
+
+    this_month_charges = user_charges.filter(amount__lte=0, date__year=now.year, date__month=now.month)
+    this_total = this_month_charges.aggregate(Sum("amount"))["amount__sum"]
+
+    if this_total is not None:
+        this_total = -this_total
+
+    context["month_total"] = this_total
+
+    prev_month_charges = user_charges.filter(amount__lte=0, date__year=prev.year, date__month=prev.month)
+    prev_total = prev_month_charges.aggregate(Sum("amount"))["amount__sum"]
+
+    if prev_total is not None:
+        prev_total = -prev_total
+
+    context["prev_total"] = prev_total
+
+    context["month_charges"] = len(this_month_charges)
+    context["prev_charges"] = len(prev_month_charges)
+
+    print(str.format("month_total: {}", this_total))
+    print(str.format("prev_total: {}", prev_total))
+
+    print(context)
+
     return render(request, "utgifter/index.html", context)
 
 
@@ -148,7 +177,7 @@ def assign_charge_tags(request):
     for charge in charges:
         # This means it won't re-match rows that were tagged by a matcher, but it will re-match
         # manually tagged rows, effectively overriding them.
-        #if charge.matcher:
+        # if charge.matcher:
         #    continue
 
         # This means it won't re-match manually tagged rows, so it won't override the manual ones.
