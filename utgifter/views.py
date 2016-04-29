@@ -142,7 +142,15 @@ def assign_charge_tags(request):
     matchers = Matcher.objects.filter(user=request.user)
 
     for charge in charges:
-        if charge.matcher: continue  # don't re-match already matched rows
+        # This means it won't re-match rows that were tagged by a matcher, but it will re-match
+        # manually tagged rows, effectively overriding them.
+        #if charge.matcher:
+        #    continue
+
+        # This means it won't re-match manually tagged rows, so it won't override the manual ones.
+        if charge.tag:
+            continue
+
         for matcher in matchers:
             searchstrings = matcher.searchstring_set.all()
             for searchstring in searchstrings:
