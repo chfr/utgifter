@@ -1,0 +1,60 @@
+{% extends 'utgifter/master_layout.html' %}
+
+{% load tags %}
+
+{%  block pagetitle  %} Sums {% endblock %}
+
+
+{% block body %}
+<div id="wrapper">
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <section id="content" class="col-md-8 col-md-offset-2">
+        <div class="row">
+            <div class="text-center well col-md-6 col-md-offset-3">
+                <a href="{% url 'spreadsheet' year|add:-1 %}/{{ display }}">
+                    <button class="btn btn-primary btn-sm pull-left">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        {{ year|add:-1 }}
+                    </button>
+                </a>
+                <span>{{ year }}</span>
+                <a href="{% url 'spreadsheet' year|add:1 %}/{{ display }}">
+                    <button class="btn btn-primary btn-sm pull-right">
+                        {{ year|add:1 }}
+                        <span class="glyphicon glyphicon-chevron-right"></span></button>
+                </a>
+            </div>
+        </div>
+        <table class="table table-bordered table-condensed table-hover table-striped">
+            <tr>
+                <th>Tag</th>
+                {% for m in months %}
+                    <th>{{ m }}</th>
+                {% endfor %}
+                <th></th>
+                <th>Total</th>
+                <th>Avg/month</th>
+            </tr>
+            {% for tag, tagsums, tagtotal, tagavg in tagsums %}
+            <tr>
+                <td {% if tag.color %}style="background: {{ tag.color }};" {% endif %}>{{ tag }}</td>
+                {% for sum in tagsums %}
+                    <td>{{ sum|floatformat:0 }}</td>
+                {% endfor %}
+                <td></td>
+                <td>{{ tagtotal|floatformat:0 }}</td>
+                <td>{{ tagavg|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </section>
+    <aside>
+    </aside>
+    <footer>
+    </footer>
+</div>
+{% endblock %}

@@ -11,7 +11,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .charge_parser import parse_nordea
 from .forms import TagForm, MatcherForm
 from .models import Charge, Matcher, Tag, SearchString
-from .utils import sanitize_date, dump_data_to_json, load_data_from_json
+from .templatetags.tags import month_name_short
+from .utils import sanitize_date, sanitize_year, dump_data_to_json, load_data_from_json
 
 
 @login_required
@@ -372,6 +373,39 @@ def tags(request):
 
     context = {"tags": tags, "form": form, "default_color": default_color}
     return render(request, "utgifter/tags.html", context)
+
+
+@login_required
+def spreadsheet(request, year=0):
+    year = sanitize_year(year)
+
+    tags = Tag.objects.filter(user=request.user)
+    user_charges = Charge.objects.filter(user=request.user, date__year=year)
+
+    months = [month_name_short(i + 1) for i in range(12)]
+    tagsums = []
+
+    for tag in tags:
+        monthsums = []
+        tagtotal = 0
+        filledtagsums = []
+        tagavg = 0
+        for month in range(12):
+            monthsum = user_charges.filter(tag=tag, date__month=month + 1).aggregate(Sum("amount"))["amount__sum"]
+            if monthsum is None:
+                monthsum = 0
+            else:
+                filledtagsums.append(monthsum)
+            monthsum = monthsum if monthsum is not None else 0
+            monthsums.append(monthsum)
+            tagtotal += monthsum
+            if filledtagsums:
+                tagavg = sum(filledtagsums) / len(filledtagsums)
+        tagsums.append((tag, monthsums, tagtotal, tagavg))
+
+    context = {"months": months, "tagsums": tagsums, "year": year}
+
+    return render(request, "utgifter/spreadsheet.html", context)
 
 
 @login_required
