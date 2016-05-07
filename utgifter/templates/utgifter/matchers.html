@@ -64,7 +64,8 @@
             searchstring = $("#matcher"+matcher).val();
             $.post( "{% url 'matcher_add_searchstring' %}", {"string": searchstring, "matcher": matcher},
                 function( data ) {
-                    window.location.replace("{% url 'matchers' %}");
+                    window.location.replace("{% url 'matchers' %}" + "#matcherRow"+matcher);
+                    window.location.reload(true);
             });
         }
 
@@ -102,7 +103,7 @@
                 <th>Actions</th>
             </tr>
             {% for matcher in matchers %}
-            <tr>
+            <tr id="matcherRow{{ matcher.pk }}">
                 <td>{{ matcher.name }}</td>
                 <td>{{ matcher.get_method_display }}</td>
                 <td>{{ matcher.tag|default:"" }}</td>
@@ -157,7 +158,7 @@
                     </td>
                 </form>
             </tr>
-            <tr>
+            <tr id="emptyAddRow">
                 <td colspan="4"><a href="javascript:void(0)" onclick="javascript:addMatcher();">Add new matcher</a></td>
             </tr>
 

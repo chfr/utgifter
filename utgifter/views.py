@@ -2,6 +2,7 @@ import json
 from datetime import date, timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -275,7 +276,7 @@ def delete_tag(request, tag_id):
 
 
 @login_required
-def matchers(request):
+def matchers(request, anchor=None):
     matchers = Matcher.objects.filter(user=request.user)
 
     tags = Tag.objects.filter(user=request.user)
@@ -297,7 +298,8 @@ def matchers(request):
                 SearchString.objects.get_or_create(user=request.user, matcher=matcher,
                                                    string=searchstring)
 
-            return redirect("matchers")
+            url = reverse("matchers", kwargs={"anchor": "emptyAddRow"}).replace("%23", "#")
+            return redirect(url)
     else:
         form = MatcherForm()
 
@@ -323,7 +325,8 @@ def matcher_remove_searchstring(request, matcher_id, searchstring_id):
     if searchstring.matcher == matcher:
         searchstring.delete()
 
-    return redirect("matchers")
+    url = reverse("matchers", kwargs={"anchor": str.format("matcherRow{}", matcher_id)}).replace("%23", "#")
+    return redirect(url)
 
 
 @login_required

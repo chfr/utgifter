@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^charge/(\d+)/clear/?$', views.clear_charge_tag, name="clear_charge_tag"),
     url(r'^matcher/delete/(\d+)/??$', views.matcher_delete, name='matcher_delete'),
     url(r'^matchers/?$', views.matchers, name='matchers'),
+    url(r'^matchers/?#(?P<anchor>[-_\w]+)$', views.matchers, name='matchers'),
     url(r'^searchstring/add/?$', views.matcher_add_searchstring, name='matcher_add_searchstring'),
     url(r'^searchstring/remove/(\d+)/(\d+)/?$', views.matcher_remove_searchstring, name='matcher_remove_searchstring'),
     url(r'^tags/?$', views.tags, name='tags'),
