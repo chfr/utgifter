@@ -132,7 +132,7 @@
     <section id="content">
         <div class="col-md-10 col-md-offset-1">
             {% include "utgifter/charges_nav.html" %}
-            <div class="row col-md-8 col-md-offset-2">
+            <div class="row col-md-8 col-md-offset-5" style="margin-bottom: 5px;">
                 <div class="dropdown ">
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
                         {% if cur_account %}
@@ -146,10 +146,11 @@
                     {% for account in accounts %}
                         <li><a href="{% url 'charges' account.pk cur_month.year cur_month.month %}">{{ account.name }}{% if account.number %} ({{ account.number }}) {% endif %}</a></li>
                     {% endfor %}
+                        <li><a href="{% url 'charges' cur_month.year cur_month.month %}">All</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="row col-md-10">
+            <div class="row col-md-10" style="margin-bottom: 5px;">
                 <a href="{% url 'assign_charge_tags' %}">
                     <button class="btn btn-primary btn-sm">Assign tags</button>
                 </a>
