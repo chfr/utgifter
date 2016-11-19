@@ -21,6 +21,9 @@
                         <option value="{{ account.id }}">{{ account.name }}{% if account.number %} ({{ account.number }}){% endif %}</option>
                     {% endfor %}
                 </select>
+                {% if accounts|length == 0 %}
+                    <b>&nbsp;You have no accounts, click <a href="{% url 'accounts' %}">here</a> to visit the accounts page.
+                {% endif %}
                 <br>
                 <input type="submit" class="btn btn-primary" value="Import">
                 &nbsp;&nbsp;<input name="autotag" id="autotag" type="checkbox">
