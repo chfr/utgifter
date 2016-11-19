@@ -126,12 +126,18 @@ def account_delete(request, account_id):
 
 
 @login_required
-def charges(request, account_id=None, display="all", year=0, month=0):
+def charges(request, display="all", year=0, month=0):
     year, month = sanitize_date(year, month)
 
+    account_id = request.GET.get("account", None)
+
     if account_id is not None:
+        try:
+            account_id = int(account_id)
+        except (ValueError, IndexError):
+            return HttpResponseBadRequest("Invalid account id")
+
         account = get_object_or_404(Account, user=request.user, pk=account_id)
-        print("haz account")
     else:
         account = None
 

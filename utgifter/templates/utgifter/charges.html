@@ -131,25 +131,16 @@
     </nav>
     <section id="content">
         <div class="col-md-10 col-md-offset-1">
-            {% include "utgifter/charges_nav.html" %}
-            <div class="row col-md-8 col-md-offset-5" style="margin-bottom: 5px;">
-                <div class="dropdown ">
-                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-                        {% if cur_account %}
-                            Account: {{ cur_account.name }}{% if cur_account.number %} ({{ cur_account.number }}) {% endif %}
-                        {% else %}
-                            Select account
-                        {% endif %}
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                    {% for account in accounts %}
-                        <li><a href="{% url 'charges' account.pk cur_month.year cur_month.month %}">{{ account.name }}{% if account.number %} ({{ account.number }}) {% endif %}</a></li>
-                    {% endfor %}
-                        <li><a href="{% url 'charges' cur_month.year cur_month.month %}">All</a></li>
-                    </ul>
-                </div>
-            </div>
+            {% if cur_account %}
+                {% with account_param="?account=" %}
+                    {% include "utgifter/charges_nav.html" %}
+                {% endwith %}
+            {% else %}
+                {% include "utgifter/charges_nav.html" %}
+            {% endif %}
+
+            {% url 'charges' cur_month.year cur_month.month as account_base_url %}
+            {% include "utgifter/account_selector.html" %}
             <div class="row col-md-10" style="margin-bottom: 5px;">
                 <a href="{% url 'assign_charge_tags' %}">
                     <button class="btn btn-primary btn-sm">Assign tags</button>
@@ -161,13 +152,13 @@
             <div class="row">
                 <div class="col-md-12">
                     {% if cur_account %}
-                        <a href="{% url 'charges' cur_account.pk cur_month.year cur_month.month %}">
+                        <a href="{% url 'charges' cur_month.year cur_month.month %}?account={{ cur_account.pk }}">
                             <button class="btn btn-primary btn-sm">Show all</button>
                         </a>
-                        <a href="{% url 'charges' cur_account.pk cur_month.year cur_month.month 'tagged' %}">
+                        <a href="{% url 'charges' cur_month.year cur_month.month 'tagged' %}?account={{ cur_account.pk }}">
                             <button class="btn btn-primary btn-sm">Show only tagged</button>
                         </a>
-                        <a href="{% url 'charges' cur_account.pk cur_month.year cur_month.month 'untagged' %}">
+                        <a href="{% url 'charges' cur_month.year cur_month.month 'untagged' %}?account={{ cur_account.pk }}">
                             <button class="btn btn-primary btn-sm">Show only untagged</button>
                         </a>
                     {% else %}
@@ -242,13 +233,13 @@
             <div class="row">
                 <div class="col-md-12">
                     {% if cur_account %}
-                        <a href="{% url 'charges' cur_account.pk cur_month.year cur_month.month %}">
+                        <a href="{% url 'charges' cur_month.year cur_month.month %}?account={{ cur_account.pk }}">
                             <button class="btn btn-primary btn-sm">Show all</button>
                         </a>
-                        <a href="{% url 'charges' cur_account.pk cur_month.year cur_month.month 'tagged' %}">
+                        <a href="{% url 'charges' cur_month.year cur_month.month 'tagged' %}?account={{ cur_account.pk }}">
                             <button class="btn btn-primary btn-sm">Show only tagged</button>
                         </a>
-                        <a href="{% url 'charges' cur_account.pk cur_month.year cur_month.month 'untagged' %}">
+                        <a href="{% url 'charges' cur_month.year cur_month.month 'untagged' %}?account={{ cur_account.pk }}">
                             <button class="btn btn-primary btn-sm">Show only untagged</button>
                         </a>
                     {% else %}
@@ -268,7 +259,13 @@
                     </button>
                 </div>
             </div>
-            {% include "utgifter/charges_nav.html" %}
+            {% if cur_account %}
+                {% with account_param="?account=" %}
+                    {% include "utgifter/charges_nav.html" %}
+                {% endwith %}
+            {% else %}
+                {% include "utgifter/charges_nav.html" %}
+            {% endif %}
         </div>
     </section>
     <aside>
