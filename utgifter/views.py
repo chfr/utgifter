@@ -462,7 +462,7 @@ def spreadsheet(request, year=0):
         # nothing else for the rest of the year, the filtered average for
         # "food" that year would be 100. The "true" average would of course
         # be 100/12 = ~8.3
-        filtered_avg = tag_year_total/(12-num_empty)
+        filtered_avg = 0 if num_empty == 12 else tag_year_total/(12-num_empty)  # no zero division here mister
         true_avg = tag_year_total/12
 
         tag_stats.append((tag, sums_per_month, tag_year_total, filtered_avg, true_avg))
