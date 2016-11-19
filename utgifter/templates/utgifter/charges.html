@@ -190,6 +190,7 @@
             <table class="table table-bordered table-condensed table-hover">
                 <tr>
                     <th>Date</th>
+                    <th>Account</th>
                     <th>Charge</th>
                     <th>Amount</th>
                     <th>Tag</th>
@@ -198,6 +199,7 @@
                 {% for charge in charges %}
                 <tr class="trCharge" id="trCharge{{ charge.pk }}">
                     <td class="chargeDate">{{ charge.short_date }}</td>
+                    <td class="chargeAccount" bgcolor="{{ charge.account.color }}">{{ charge.account.name }}</td>
                     <td class="chargeName">{{ charge.name }}</td>
                     <td class="chargeAmount {%if charge.amount < 0 %}danger{% else %}success{% endif %}">
                         {{ charge.amount }}
