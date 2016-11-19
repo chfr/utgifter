@@ -138,9 +138,10 @@
             {% else %}
                 {% include "utgifter/charges_nav.html" %}
             {% endif %}
-
-            {% url 'charges' cur_month.year cur_month.month as account_base_url %}
-            {% include "utgifter/account_selector.html" %}
+            <div class="row col-md-8 col-md-offset-5" style="margin-bottom: 5px;">
+                {% url 'charges' cur_month.year cur_month.month as account_base_url %}
+                {% include "utgifter/account_selector.html" %}
+            </div>
             <div class="row col-md-10" style="margin-bottom: 5px;">
                 <a href="{% url 'assign_charge_tags' %}">
                     <button class="btn btn-primary btn-sm">Assign tags</button>

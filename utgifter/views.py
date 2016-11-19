@@ -12,7 +12,7 @@ from .charge_parser import parse_nordea
 from .forms import TagForm, MatcherForm, AccountForm
 from .models import Charge, Matcher, Tag, SearchString, Account
 from .templatetags.tags import month_name_short
-from .utils import sanitize_date, sanitize_year, dump_data_to_json, load_data_from_json
+from .utils import sanitize_date, sanitize_year, dump_data_to_json, load_data_from_json, get_account_from_request
 
 
 @login_required
@@ -129,17 +129,7 @@ def account_delete(request, account_id):
 def charges(request, display="all", year=0, month=0):
     year, month = sanitize_date(year, month)
 
-    account_id = request.GET.get("account", None)
-
-    if account_id is not None:
-        try:
-            account_id = int(account_id)
-        except (ValueError, IndexError):
-            return HttpResponseBadRequest("Invalid account id")
-
-        account = get_object_or_404(Account, user=request.user, pk=account_id)
-    else:
-        account = None
+    account = get_account_from_request(request)
 
     if account:
         charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month,
@@ -443,6 +433,9 @@ def tags(request):
 def spreadsheet(request, year=0):
     year = sanitize_year(year)
 
+    account = get_account_from_request(request)
+    accounts = Account.objects.filter(user=request.user)
+
     tags = Tag.objects.filter(user=request.user)
     user_charges = Charge.objects.filter(user=request.user, date__year=year)
 
@@ -474,7 +467,9 @@ def spreadsheet(request, year=0):
         tag_stats.append((tag, sums_per_month, tag_year_total, filtered_avg, true_avg))
         #print("Tag {}: sums_per_month: {}, tag_year_total: {}, filtered_avg: {}".format(tag, sums_per_month, tag_year_total, filtered_avg))
 
-    context = {"months": months, "tag_stats": tag_stats, "year": year}
+    context = {"months": months, "tag_stats": tag_stats, "year": year, "accounts": accounts}
+    if account:
+        context["cur_account"] = account
 
     return render(request, "utgifter/spreadsheet.html", context)
 

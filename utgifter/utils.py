@@ -1,7 +1,10 @@
 import json
 from datetime import date
 
-from .models import Tag, SearchString, Matcher, Charge
+from django.http import HttpResponseBadRequest
+from django.shortcuts import get_object_or_404
+
+from .models import Tag, SearchString, Matcher, Charge, Account
 
 
 def dump_data_to_json(user):
@@ -118,3 +121,25 @@ def current_month_number():
 
 def current_year_number():
     return date.today().year
+
+
+def get_account_from_request(request):
+    """"
+    Get account info, if any, from the request object.
+    Account info is given as a GET parameter like so:
+    /some/path?account=1
+    Returns the account if found, otherwise None
+    """
+    account_id = request.GET.get("account", None)
+
+    if account_id is not None:
+        try:
+            account_id = int(account_id)
+        except (ValueError, IndexError):
+            return HttpResponseBadRequest("Invalid account id")
+
+        account = get_object_or_404(Account, user=request.user, pk=account_id)
+    else:
+        account = None
+
+    return account

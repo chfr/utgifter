@@ -14,25 +14,43 @@
     <section id="content" class="col-md-10 col-md-offset-1">
         <div class="row">
             <div class="text-center well col-md-6 col-md-offset-3">
+                {% if cur_account %}
+                <a href="{% url 'spreadsheet' year|add:-1 %}/{{ display }}?account={{ cur_account.pk }}">
+                {% else %}
                 <a href="{% url 'spreadsheet' year|add:-1 %}/{{ display }}">
+                {% endif %}
+
                     <button class="btn btn-primary btn-sm pull-left">
                         <span class="glyphicon glyphicon-chevron-left"></span>
                         {{ year|add:-1 }}
                     </button>
                 </a>
                 <span>{{ year }}</span>
-                <a href="{% url 'spreadsheet' year|add:1 %}/{{ display }}">
+                {% if cur_account %}
+                    <a href="{% url 'spreadsheet' year|add:1 %}/{{ display }}?account={{ cur_account.pk }}">
+                {% else %}
+                    <a href="{% url 'spreadsheet' year|add:1 %}/{{ display }}">
+                {% endif %}
                     <button class="btn btn-primary btn-sm pull-right">
                         {{ year|add:1 }}
                         <span class="glyphicon glyphicon-chevron-right"></span></button>
                 </a>
+            </div>
+            <div class="row col-md-8 col-md-offset-5" style="margin-bottom: 15px;">
+                {% url 'spreadsheet' year as account_base_url %}
+                {% include "utgifter/account_selector.html" %}
             </div>
         </div>
         <table class="table table-bordered table-condensed table-hover table-striped">
             <tr>
                 <th>Tag</th>
                 {% for m in months %}
-                    <th><a href="{% url 'charges' year forloop.counter %}">{{ m }}</a></th>
+                    {% if cur_account %}
+                        <th><a href="{% url 'charges' year forloop.counter %}?account={{ cur_account.pk }}">
+                    {% else %}
+                        <th><a href="{% url 'charges' year forloop.counter %}">
+                    {% endif %}
+                        {{ m }}</a></th>
                 {% endfor %}
                 <th></th>
                 <th>Total</th>
@@ -51,7 +69,6 @@
                 <td>{{ true_avg|floatformat:0 }}</td>
             </tr>
             {% endfor %}
-
         </table>
     </section>
     <aside>

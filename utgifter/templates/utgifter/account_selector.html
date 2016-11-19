@@ -1,20 +1,19 @@
 {% load tags %}
 
-<div class="row col-md-8 col-md-offset-5" style="margin-bottom: 5px;">
-    <div class="dropdown ">
-        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-            {% if cur_account %}
-                Account: {{ cur_account.name }}{% if cur_account.number %} ({{ cur_account.number }}) {% endif %}
-            {% else %}
-                Select account
-            {% endif %}
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-        {% for account in accounts %}
-            <li><a href="{{ account_base_url }}?account={{ account.pk }}">{{ account.name }}{% if account.number %} ({{ account.number }}) {% endif %}</a></li>
-        {% endfor %}
-            <li><a href="{{ account_base_url }}">All</a></li>
-        </ul>
-    </div>
+
+<div class="dropdown ">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+        {% if cur_account %}
+            Account: {{ cur_account.name }}{% if cur_account.number %} ({{ cur_account.number }}) {% endif %}
+        {% else %}
+            Select account
+        {% endif %}
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+    {% for account in accounts %}
+        <li><a href="{{ account_base_url }}?account={{ account.pk }}">{{ account.name }}{% if account.number %} ({{ account.number }}) {% endif %}</a></li>
+    {% endfor %}
+        <li><a href="{{ account_base_url }}">All</a></li>
+    </ul>
 </div>
