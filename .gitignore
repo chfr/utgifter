@@ -2,6 +2,7 @@
 *.sqlite3
 .idea
 www/
+utgifter_proj/config.py
 
 # GitHub Python .gitignore below
 
