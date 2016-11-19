@@ -42,11 +42,6 @@ def index(request):
     context["month_charges"] = len(this_month_charges)
     context["prev_charges"] = len(prev_month_charges)
 
-    print(str.format("month_total: {}", this_total))
-    print(str.format("prev_total: {}", prev_total))
-
-    print(context)
-
     return render(request, "utgifter/index.html", context)
 
 
@@ -56,7 +51,6 @@ def import_data(request):
     do_tagging = False
 
     if request.method == "POST":
-        print(request.POST)
         if "raw_charges" in request.POST and not "json_data" in request.POST:
             if "autotag" in request.POST:
                 if request.POST["autotag"] == "on":
