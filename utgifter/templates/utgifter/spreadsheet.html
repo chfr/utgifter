@@ -32,7 +32,7 @@
             <tr>
                 <th>Tag</th>
                 {% for m in months %}
-                    <th>{{ m }}</th>
+                    <th><a href="{% url 'charges' year forloop.counter %}">{{ m }}</a></th>
                 {% endfor %}
                 <th></th>
                 <th>Total</th>
