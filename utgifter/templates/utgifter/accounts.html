@@ -1,0 +1,33 @@
+{% extends 'utgifter/master_layout.html' %}
+
+{%  block pagetitle  %} Index {% endblock %}
+
+{% block body %}
+<div id="wrapper">
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <section id="content">
+        <div class="col-md-10 col-md-offset-1">
+            Hi {{ request.user.username }}!<br>
+
+            {% if month_total %}
+                So far this month you've spent {{ month_total }} SEK.
+            {% else %}
+                So far this month you haven't logged any charges!
+            {% endif %}
+
+            {% if prev_total %}
+                Last month you spent {{ prev_total }} SEK.
+            {% else %}
+                Last month you didn't log any charges.
+            {% endif %}
+        </div>
+    </section>
+    <aside>
+    </aside>
+    <footer>
+    </footer>
+</div>
+{% endblock %}
