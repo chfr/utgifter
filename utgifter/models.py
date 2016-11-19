@@ -1,10 +1,26 @@
+import datetime
+
 from colorful.fields import RGBColorField
 from django.contrib.auth.models import User
 from django.db import models
 
 
+class Account(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, blank=False, null=False, unique=True)
+    number = models.CharField(max_length=200, blank=True, verbose_name="Number (optional)")
+    color = RGBColorField(default="#b9d8e7")
+
+    def __str__(self):
+        if self.number:
+            return "{} ({}, {})".format(self.name, self.user, self.number)
+        else:
+            return "{} ({})".format(self.name, self.user)
+
+
 class Charge(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
     date = models.DateField()
     name = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -12,12 +28,15 @@ class Charge(models.Model):
     matcher = models.ForeignKey("Matcher", null=True, blank=True, default=None, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return str.format("{} {} {}", self.date, self.name, self.amount)
+        return str.format("{} {} {} ({})", self.date, self.name, self.amount, self.account.name)
 
     # Does not call save()
     def clear(self):
         self.tag = None
         self.matcher = None
+
+    def short_date(self):
+        return self.date.strftime("%B %d")
 
 
 class Tag(models.Model):

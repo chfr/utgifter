@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Matcher, Tag
+from .models import Matcher, Tag, Account
 
 
 class MatcherForm(forms.ModelForm):
@@ -15,3 +15,10 @@ class TagForm(forms.ModelForm):
     class Meta:
         model = Tag
         fields = ["name", "color"]
+
+
+class AccountForm(forms.ModelForm):
+
+    class Meta:
+        model = Account
+        fields = ["name", "number", "color"]

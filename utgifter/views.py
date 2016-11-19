@@ -4,13 +4,13 @@ from datetime import date, timedelta
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 from .charge_parser import parse_nordea
-from .forms import TagForm, MatcherForm
-from .models import Charge, Matcher, Tag, SearchString
+from .forms import TagForm, MatcherForm, AccountForm
+from .models import Charge, Matcher, Tag, SearchString, Account
 from .templatetags.tags import month_name_short
 from .utils import sanitize_date, sanitize_year, dump_data_to_json, load_data_from_json
 
@@ -53,20 +53,29 @@ def index(request):
 @login_required
 def import_data(request):
     context = {}
-    charges = []
     do_tagging = False
 
     if request.method == "POST":
+        print(request.POST)
         if "raw_charges" in request.POST and not "json_data" in request.POST:
             if "autotag" in request.POST:
                 if request.POST["autotag"] == "on":
                     do_tagging = True
 
+            try:
+                account_id = int(request.POST["account"][0])
+            except (ValueError, IndexError):
+                return HttpResponseBadRequest("Invalid account id")
+
+            account = get_object_or_404(Account, pk=account_id, user=request.user)
+
+            new_charges = []
             for row in parse_nordea(request.POST["raw_charges"]):
                 row["user"] = request.user
-                charges.append(Charge(**row))
+                row["account"] = account
+                new_charges.append(Charge(**row))
 
-            Charge.objects.bulk_create(charges)
+            Charge.objects.bulk_create(new_charges)
 
             if do_tagging:
                 return redirect("assign_charge_tags")
@@ -74,6 +83,7 @@ def import_data(request):
                 return redirect("charges")
         elif "raw_charges" not in request.POST and "json_data" in request.POST:
             load_data_from_json(request.user, json.loads(request.POST["json_data"]))
+    context["accounts"] = Account.objects.filter(user=request.user)
 
     return render(request, "utgifter/import_charges.html", context)
 
@@ -87,15 +97,59 @@ def export_data(request):
 
 
 @login_required
-def charges(request, display="all", year=0, month=0):
+def accounts(request):
+    context = {}
+    context["accounts"] = Account.objects.filter(user=request.user)
+
+    if request.method == "POST":
+        form = AccountForm(request.POST)
+
+        if form.is_valid():
+            account = form.save(commit=False)
+            account.user = request.user
+            account.save()
+            return redirect(reverse("accounts"))
+
+    else:
+        form = AccountForm()
+
+    context["form"] = form
+
+    return render(request, "utgifter/accounts.html", context)\
+
+@login_required
+def account_delete(request, account_id):
+    account = get_object_or_404(Account, user=request.user, pk=account_id)
+    account.delete()
+
+    return redirect(reverse("accounts"))
+
+
+@login_required
+def charges(request, account_id=None, display="all", year=0, month=0):
     year, month = sanitize_date(year, month)
-    charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month).order_by("date")
+
+    if account_id is not None:
+        account = get_object_or_404(Account, user=request.user, pk=account_id)
+        print("haz account")
+    else:
+        account = None
+
+    if account:
+        charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month,
+                                        account=account).order_by("date")
+    else:
+        charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month)\
+            .order_by("date")
+
     if display == "tagged":
         charges = charges.exclude(tag=None)
     elif display == "untagged":
         charges = charges.filter(tag=None)
 
     tags = Tag.objects.filter(user=request.user)
+
+    accounts = Account.objects.filter(user=request.user)
 
     cur_month = date(year=year, month=month, day=15)
     next_month = cur_month + timedelta(days=30)  # will this always work? let's hope!
@@ -106,7 +160,11 @@ def charges(request, display="all", year=0, month=0):
         months.append({"num": i, "cur": i == cur_month.month})
 
     context = {"charges": charges, "tags": tags, "cur_month": cur_month, "prev_month": prev_month,
-               "next_month": next_month, "display": display, "months": months, "year": year}
+               "next_month": next_month, "display": display, "months": months, "year": year,
+               "accounts": accounts}
+
+    if account:
+        context["cur_account"] = account
 
     return render(request, 'utgifter/charges.html', context)
 

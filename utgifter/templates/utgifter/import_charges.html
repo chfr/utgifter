@@ -10,14 +10,20 @@
     <nav>
     </nav>
     <section id="content" class="col-md-8 col-md-offset-2">
-        <form action="{% url 'import_data' %}" method="POST">
+        <form action="{% url 'import_data' %}" method="POST" id="import_charges_form">
             {% csrf_token %}
             <div class="form-group">
                 <label for="import_charges">Import charges</label>
                 <textarea name="raw_charges" class="form-control" rows="15" id="import_charges"></textarea>
-
+                <label for="account">Account</label>&nbsp;&nbsp;
+                <select name="account" form="import_charges_form" id="account" required>
+                    {% for account in accounts %}
+                        <option value="{{ account.id }}">{{ account.name }}{% if account.number %} ({{ account.number }}){% endif %}</option>
+                    {% endfor %}
+                </select>
+                <br>
                 <input type="submit" class="btn btn-primary" value="Import">
-                <input name="autotag" id="autotag" type="checkbox">
+                &nbsp;&nbsp;<input name="autotag" id="autotag" type="checkbox">
                 <label for="autotag" class="control-label">Assign tags automatically</label>
             </div>
         </form>

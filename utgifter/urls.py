@@ -18,7 +18,13 @@ urlpatterns = [
 
     url(r'^import/?$', views.import_data, name='import_data'),
     url(r'^export/?$', views.export_data, name='export_data'),
+    url(r'^accounts/?$', views.accounts, name='accounts'),
+    url(r'^account/(\d+)/delete/?$', views.account_delete, name='account_delete'),
     url(r'^charges/?$', views.charges, name='charges'),
+    url(r'^charges/(?P<account_id>\d+)/?$', views.charges, name='charges'),
+    url(r'^charges/(?P<account_id>\d+)/(?P<year>\d+)/(?P<month>\d+)/?$', views.charges, name='charges'),
+    url(r'^charges/(?P<account_id>\d+)/(?P<display>all|tagged|untagged)/?$', views.charges, name='charges'),
+    url(r'^charges/(?P<account_id>\d+)/(?P<year>\d+)/(?P<month>\d+)/(?P<display>all|tagged|untagged)/?$', views.charges, name='charges'),
     url(r'^charges/(?P<year>\d+)/(?P<month>\d+)/?$', views.charges, name='charges'),
     url(r'^charges/(?P<display>all|tagged|untagged)/?$', views.charges, name='charges'),
     url(r'^charges/(?P<year>\d+)/(?P<month>\d+)/(?P<display>all|tagged|untagged)/?$', views.charges, name='charges'),

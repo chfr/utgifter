@@ -1,7 +1,13 @@
 {% extends 'utgifter/master_layout.html' %}
 
-{%  block pagetitle  %} Index {% endblock %}
-
+{%  block pagetitle  %} Accounts {% endblock %}
+{% block head %}
+<style>
+    #addaccounts {
+        margin-top: 30px;
+    }
+</style>
+{% endblock %}
 {% block body %}
 <div id="wrapper">
     <header>
@@ -10,19 +16,31 @@
     </nav>
     <section id="content">
         <div class="col-md-10 col-md-offset-1">
-            Hi {{ request.user.username }}!<br>
+            <div id ="accounts">
+                <p><h3>Accounts</h3></p>
+                <table class="table table-bordered table-condensed table-hover table-striped">
+                    <tr><th>Color</th><th>Name</th><th>Number</th><th>Actions</th></tr>
+                    {% for account in accounts %}
+                        <tr>
+                            <td bgcolor="{{ account.color }}"></td>
+                            <td>{{ account.name }}</td>
+                            <td>{{ account.number }}</td>
+                            <td><a href="{% url 'account_delete' account.id %}">Delete</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr><td>No accounts added yet</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
 
-            {% if month_total %}
-                So far this month you've spent {{ month_total }} SEK.
-            {% else %}
-                So far this month you haven't logged any charges!
-            {% endif %}
-
-            {% if prev_total %}
-                Last month you spent {{ prev_total }} SEK.
-            {% else %}
-                Last month you didn't log any charges.
-            {% endif %}
+            <div id ="addaccounts" class="col-md-5 well">
+                <h4 class="text-center">Add account</h4>
+                <form id="add_account_form" action="{% url 'accounts' %}" method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" class="btn btn-primary" value="Add account">
+                </form>
+            </div>
         </div>
     </section>
     <aside>
