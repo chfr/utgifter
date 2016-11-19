@@ -441,27 +441,34 @@ def spreadsheet(request, year=0):
     user_charges = Charge.objects.filter(user=request.user, date__year=year)
 
     months = [month_name_short(i + 1) for i in range(12)]
-    tagsums = []
+    tag_stats = []
 
     for tag in tags:
-        monthsums = []
-        tagtotal = 0
-        filledtagsums = []
-        tagavg = 0
-        for month in range(12):
-            monthsum = user_charges.filter(tag=tag, date__month=month + 1).aggregate(Sum("amount"))["amount__sum"]
-            if monthsum is None:
-                monthsum = 0
-            else:
-                filledtagsums.append(monthsum)
-            monthsum = monthsum if monthsum is not None else 0
-            monthsums.append(monthsum)
-            tagtotal += monthsum
-            if filledtagsums:
-                tagavg = sum(filledtagsums) / len(filledtagsums)
-        tagsums.append((tag, monthsums, tagtotal, tagavg))
+        sums_per_month = []  # list of each month's total for this particular tag
+        tag_year_total = 0  # total sum for this tag over the year
+        num_empty = 0  # the number of empty (0) cells for this particular tag
 
-    context = {"months": months, "tagsums": tagsums, "year": year}
+        for month in range(12):
+            month_sum = user_charges.filter(tag=tag, date__month=month + 1).aggregate(Sum("amount"))["amount__sum"]
+            if month_sum is None:  # no charges for this month
+                month_sum = 0
+                num_empty += 1
+
+            sums_per_month.append(month_sum)
+            tag_year_total += month_sum
+
+        # Filtered average over the year, only averages over non-empty months.
+        # In other words, if you had 100 EUR tagged as "food" in January and
+        # nothing else for the rest of the year, the filtered average for
+        # "food" that year would be 100. The "true" average would of course
+        # be 100/12 = ~8.3
+        filtered_avg = tag_year_total/(12-num_empty)
+        true_avg = tag_year_total/12
+
+        tag_stats.append((tag, sums_per_month, tag_year_total, filtered_avg, true_avg))
+        #print("Tag {}: sums_per_month: {}, tag_year_total: {}, filtered_avg: {}".format(tag, sums_per_month, tag_year_total, filtered_avg))
+
+    context = {"months": months, "tag_stats": tag_stats, "year": year}
 
     return render(request, "utgifter/spreadsheet.html", context)
 

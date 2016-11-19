@@ -11,7 +11,7 @@
     </header>
     <nav>
     </nav>
-    <section id="content" class="col-md-8 col-md-offset-2">
+    <section id="content" class="col-md-10 col-md-offset-1">
         <div class="row">
             <div class="text-center well col-md-6 col-md-offset-3">
                 <a href="{% url 'spreadsheet' year|add:-1 %}/{{ display }}">
@@ -36,17 +36,19 @@
                 {% endfor %}
                 <th></th>
                 <th>Total</th>
-                <th>Avg/month</th>
+                <th>Filtered avg/month</th>
+                <th>True avg/month</th>
             </tr>
-            {% for tag, tagsums, tagtotal, tagavg in tagsums %}
+            {% for tag, sums_per_month, tag_total, filtered_avg, true_avg in tag_stats %}
             <tr>
-                <td {% if tag.color %}style="background: {{ tag.color }};" {% endif %}>{{ tag }}</td>
-                {% for sum in tagsums %}
-                    <td>{{ sum|floatformat:0 }}</td>
+                <td style="background: {{ tag.color }};">{{ tag }}</td>
+                {% for month_sum in sums_per_month %}
+                    <td>{{ month_sum|floatformat:0 }}</td>
                 {% endfor %}
                 <td></td>
-                <td>{{ tagtotal|floatformat:0 }}</td>
-                <td>{{ tagavg|floatformat:0 }}</td>
+                <td>{{ tag_total|floatformat:0 }}</td>
+                <td>{{ filtered_avg|floatformat:0 }}</td>
+                <td>{{ true_avg|floatformat:0 }}</td>
             </tr>
             {% endfor %}
 
