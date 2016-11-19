@@ -437,7 +437,10 @@ def spreadsheet(request, year=0):
     accounts = Account.objects.filter(user=request.user)
 
     tags = Tag.objects.filter(user=request.user)
-    user_charges = Charge.objects.filter(user=request.user, date__year=year)
+    if account:
+        user_charges = Charge.objects.filter(user=request.user, date__year=year, account=account)
+    else:
+        user_charges = Charge.objects.filter(user=request.user, date__year=year)
 
     months = [month_name_short(i + 1) for i in range(12)]
     tag_stats = []
