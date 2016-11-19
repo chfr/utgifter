@@ -121,6 +121,7 @@ def account_delete(request, account_id):
 
 @login_required
 def charges(request, display="all", year=0, month=0):
+    arg_year, arg_month = year, month
     year, month = sanitize_date(year, month)
 
     account = get_account_from_request(request)
@@ -131,6 +132,26 @@ def charges(request, display="all", year=0, month=0):
     else:
         charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month)\
             .order_by("date")
+
+    # if we requested "today" but there are no charges in the current month, search backwards
+    # until we find a month where there's at least one charge
+    if not charges and (arg_month == 0 and arg_year == 0):
+        while not charges:
+            month -= 1
+            if month == 0:
+                month = 1
+                year -= 1
+            if account:
+                charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month,
+                                                account=account).order_by("date")
+            else:
+                charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month) \
+                    .order_by("date")
+
+            if year < 2000:  # people didn't have internet banking back then, right?
+                year, month = sanitize_date("bogus", "bogus")  # dirty, dirty hacks
+                break
+
 
     if display == "tagged":
         charges = charges.exclude(tag=None)
