@@ -468,7 +468,6 @@ def spreadsheet(request, year=0):
         true_avg = tag_year_total/12
 
         tag_stats.append((tag, sums_per_month, tag_year_total, filtered_avg, true_avg))
-        #print("Tag {}: sums_per_month: {}, tag_year_total: {}, filtered_avg: {}".format(tag, sums_per_month, tag_year_total, filtered_avg))
 
     context = {"months": months, "tag_stats": tag_stats, "year": year, "accounts": accounts}
     if account:
