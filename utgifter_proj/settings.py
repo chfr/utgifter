@@ -35,7 +35,7 @@ if config and hasattr(config, "DEBUG"):
     DEBUG = config.DEBUG
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['chfr.net', 'localhost', '127.0.0.1']
 
 # Application definition
 
