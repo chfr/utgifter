@@ -3,63 +3,49 @@
     <div class="row">
         <div class="">
             {% if cur_account %}
-                <a href="{% url 'charges' cur_account.pk prev_month.year prev_month.month %}/{{ display }}">
-                    <button class="btn btn-primary btn-sm pull-left">
-                        <span class="glyphicon glyphicon-chevron-left"></span>
-                        {{ prev_month.month|month_name }} {{ prev_month.year }}
-                    </button>
-                </a>
-                <span class="h3">{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
-                <a href="{% url 'charges' cur_account.pk next_month.year next_month.month %}/{{ display }}">
-                    <button class="btn btn-primary btn-sm pull-right">
-                        {{ next_month.month|month_name }} {{ next_month.year }}
-                        <span class="glyphicon glyphicon-chevron-right"></span></button>
-                </a>
+                {% url "charges" cur_account.pk prev_month.year prev_month.month as prev_month_url %}
+                {% url "charges" cur_account.pk next_month.year next_month.month as next_month_url %}
+                {% url "charges" cur_account.pk year|add:-1 12 as prev_year_url %}
+                {% url "charges" cur_account.pk year|add:1 1 as next_year_url %}
             {% else %}
-                <a href="{% url 'charges' prev_month.year prev_month.month %}/{{ display }}">
-                            <button class="btn btn-primary btn-sm pull-left">
-                                <span class="glyphicon glyphicon-chevron-left"></span>
-                                {{ prev_month.month|month_name }} {{ prev_month.year }}
-                            </button>
-                        </a>
-                        <span class="h3">{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
-                        <a href="{% url 'charges' next_month.year next_month.month %}/{{ display }}">
-                            <button class="btn btn-primary btn-sm pull-right">
-                                {{ next_month.month|month_name }} {{ next_month.year }}
-                                <span class="glyphicon glyphicon-chevron-right"></span></button>
-                        </a>
+                {% url "charges" prev_month.year prev_month.month as prev_month_url %}
+                {% url "charges" next_month.year next_month.month as next_month_url %}
+                {% url "charges" year|add:-1 12 as prev_year_url %}
+                {% url "charges" year|add:1 1 as next_year_url %}
             {% endif %}
+            <a href="{{ prev_month_url }}/{{ display }}">
+                <button class="btn btn-primary btn-sm pull-left">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    {{ prev_month.month|month_name }} {{ prev_month.year }}
+                </button>
+            </a>
+            <span class="h3">{{ cur_month.month|month_name }} {{ cur_month.year }}</span>
+            <a href="{{ next_month_url }}/{{ display }}">
+                <button class="btn btn-primary btn-sm pull-right">
+                    {{ next_month.month|month_name }} {{ next_month.year }}
+                    <span class="glyphicon glyphicon-chevron-right"></span></button>
+            </a>
+
         </div>
     </div>
     <div class="row">
         <div class="btn-group btn-group-justified" style="margin-top: 15px;">
-            {% if cur_account %}
-                <a class="btn btn-primary btn-xs" href="{% url 'charges' cur_account.pk year|add:-1 12 %}/{{ display }}"><span
-                        class="glyphicon glyphicon-chevron-left"></span>{{ year|add:-1 }}
-                </a>
-                {% for month in months %}
-                    <a class="btn btn-primary btn-xs {% if month.cur %}btn-info{% endif %}"
+            <a class="btn btn-primary btn-xs" href="{{ prev_year_url }}/{{ display }}"><span
+                    class="glyphicon glyphicon-chevron-left"></span>{{ year|add:-1 }}
+            </a>
+            {% for month in months %}
+                <a class="btn btn-primary btn-xs {% if month.cur %}btn-info{% endif %}"
+                   {% if cur_account %}
                        href="{% url 'charges' cur_account.pk cur_month.year month.num %}/{{ display }}">
-                        {{ month.num|month_name_short }}
-                    </a>
-                {% endfor %}
-                <a class="btn btn-primary btn-xs" href="{% url 'charges' cur_account.pk year|add:1 1 %}/{{ display }}">
-                    {{ year|add:1 }}<span class="glyphicon glyphicon-chevron-right"></span>
+                   {% else %}
+                       href="{% url 'charges' cur_month.year month.num %}/{{ display }}">
+                   {% endif %}
+                    {{ month.num|month_name_short }}
                 </a>
-            {% else %}
-                <a class="btn btn-primary btn-xs" href="{% url 'charges' year|add:-1 12 %}/{{ display }}"><span
-                                class="glyphicon glyphicon-chevron-left"></span>{{ year|add:-1 }}
-                        </a>
-                        {% for month in months %}
-                            <a class="btn btn-primary btn-xs {% if month.cur %}btn-info{% endif %}"
-                               href="{% url 'charges' cur_month.year month.num %}/{{ display }}">
-                                {{ month.num|month_name_short }}
-                            </a>
-                        {% endfor %}
-                        <a class="btn btn-primary btn-xs" href="{% url 'charges' year|add:1 1 %}/{{ display }}">
-                            {{ year|add:1 }}<span class="glyphicon glyphicon-chevron-right"></span>
-                        </a>
-            {% endif %}
+            {% endfor %}
+            <a class="btn btn-primary btn-xs" href="{{ next_year_url }}/{{ display }}">
+                {{ year|add:1 }}<span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
         </div>
     </div>
 </div>
