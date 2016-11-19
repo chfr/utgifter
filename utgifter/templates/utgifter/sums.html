@@ -28,6 +28,10 @@
                 </a>
             </div>
         </div>
+        <div class="row col-md-8 col-md-offset-5" style="margin-bottom: 15px;">
+                {% url 'sums' cur_month.year cur_month.month as account_base_url %}
+                {% include "utgifter/account_selector.html" %}
+            </div>
         <table class="table table-bordered table-condensed table-hover">
             <tr>
                 <th></th>

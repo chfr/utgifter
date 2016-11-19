@@ -474,8 +474,15 @@ def spreadsheet(request, year=0):
 def sums(request, year=0, month=0):
     year, month = sanitize_date(year, month)
 
+    account = get_account_from_request(request)
+    accounts = Account.objects.filter(user=request.user)
+
     tags = Tag.objects.filter(user=request.user)
-    user_charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month)
+    if account:
+        user_charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month,
+                                             account=account)
+    else:
+        user_charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month)
 
     sums = []
 
@@ -502,7 +509,11 @@ def sums(request, year=0, month=0):
     prev_month = cur_month - timedelta(days=30)
 
     context = {"sums": sums, "cur_month": cur_month, "prev_month": prev_month,
-               "next_month": next_month}
+               "next_month": next_month, "accounts": accounts}
+
+    if account:
+        context["cur_account"] = account
+
     return render(request, "utgifter/sums.html", context)
 
 
