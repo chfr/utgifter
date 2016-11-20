@@ -234,11 +234,16 @@ def charge_set_tag(request):
 
 @login_required
 def charge_delete(request, charge_id):
+    account = get_account_from_request(request)
+
     charge = get_object_or_404(Charge, pk=charge_id, user=request.user)
 
     charge.delete()
 
-    return redirect("charges")
+    if account:
+        return redirect_with_params("charges", account=account.pk)
+    else:
+        return redirect("charges")
 
 
 @login_required
@@ -277,18 +282,29 @@ def assign_charge_tags(request):
 
 @login_required
 def change_charge_tag(request, charge_id):
+    account = get_account_from_request(request)
+
     charge = get_object_or_404(Charge, pk=charge_id, user=request.user)
 
-    return redirect("charges")
+    if account:
+        return redirect_with_params("charges", account=account.pk)
+    else:
+        return redirect("charges")
 
 
 @login_required
 def clear_charge_tag(request, charge_id):
+    account = get_account_from_request(request)
+
     charge = get_object_or_404(Charge, pk=charge_id, user=request.user)
     charge.clear()
     charge.save()
 
-    return redirect("charges")
+    if account:
+        return redirect_with_params("charges", account=account.pk)
+    else:
+        return redirect("charges")
+
 
 
 @login_required

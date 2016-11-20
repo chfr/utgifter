@@ -220,13 +220,21 @@
                             {% endif %}
                         </button>
 
-                        <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
+                        {% if cur_account %}
+                            <a href="{% url 'clear_charge_tag' charge.pk %}?account={{ cur_account.pk }}" id="untagCharge{{ charge.pk }}"
+                        {% else %}
+                            <a href="{% url 'clear_charge_tag' charge.pk %}" id="untagCharge{{ charge.pk }}"
+                        {% endif %}
                            class="btn btn-primary btn-xs unTagButton" {% if not charge.tag %} style="display:none;"
                            {% endif %}>
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
 
-                        <a href="{% url 'charge_delete' charge.pk %}" id="deleteCharge{{ charge.pk }}"
+                        {% if cur_account %}
+                            <a href="{% url 'charge_delete' charge.pk %}?account={{ cur_account.pk }}" id="deleteCharge{{ charge.pk }}"
+                        {% else %}
+                            <a href="{% url 'charge_delete' charge.pk %}" id="deleteCharge{{ charge.pk }}"
+                        {% endif %}
                            class="btn btn-primary btn-xs deleteTagButton">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
