@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^charges/assign/?$', views.assign_charge_tags, name="assign_charge_tags"),
     url(r'^charges/clear/?$', views.clear_charge_tags, name="clear_charge_tags"),
     url(r'^charge/set/?$', views.charge_set_tag, name="charge_set_tag"),
+    url(r'^charge/comment/?$', views.charge_set_comment, name="charge_set_comment"),
     url(r'^charge/(\d+)/delete/?$', views.charge_delete, name="charge_delete"),
     url(r'^charge/(\d+)/change/?$', views.change_charge_tag, name="change_charge_tag"),
     url(r'^charge/(\d+)/clear/?$', views.clear_charge_tag, name="clear_charge_tag"),

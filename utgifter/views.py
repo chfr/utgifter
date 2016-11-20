@@ -180,6 +180,30 @@ def charges(request, display="all", year=0, month=0):
 
     return render(request, 'utgifter/charges.html', context)
 
+@login_required
+@csrf_exempt
+def charge_set_comment(request):
+    account = get_account_from_request(request)
+
+    if request.method != "POST":
+        return redirect_with_params("charges", account=account.pk)
+
+    data = request.POST
+
+    if "charge" in data and "comment" in data:
+        print("got all")
+        charge = data["charge"]
+        charge = get_object_or_404(Charge, pk=charge, user=request.user)
+        charge.comment = data["comment"]
+        charge.save()
+        if account:
+            return JsonResponse({"success": 1, "url": reverse("charges") + "?account={}".format(account.pk)})
+        else:
+            return JsonResponse({"success": 1, "url": reverse("charges")})
+
+    else:
+        return HttpResponseBadRequest
+
 
 @login_required
 @csrf_exempt

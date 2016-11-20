@@ -26,6 +26,7 @@ class Charge(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     tag = models.ForeignKey("Tag", null=True, blank=True, default=None, on_delete=models.SET_NULL)
     matcher = models.ForeignKey("Matcher", null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    comment = models.CharField(max_length=500, blank=True)
 
     def __str__(self):
         return str.format("{} {} {} ({})", self.date, self.name, self.amount, self.account.name)

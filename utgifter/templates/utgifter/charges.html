@@ -6,6 +6,10 @@
 
 {% block head %}
 <script type="text/javascript">
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
     var lastClickedCharge = -1;
     var selectedCharges = [];
 
@@ -22,6 +26,33 @@
             var match = reg.exec(e.target.id);
             if (match != null) {
                 lastClickedCharge = match[1];
+            }
+        });
+
+        $("#commentInput").keypress(function(e) {
+            if (e.which == 13) {
+                var comment = $("#commentInput").val();
+                {% if cur_account %}
+                    $.post( "{% url 'charge_set_comment' %}?account={{ cur_account.pk }}", {"charge": lastClickedCommentId, "comment": comment},
+                {% else %}
+                    $.post( "{% url 'charge_set_comment' %}", {"charge": lastClickedCommentId, "comment": comment},
+                {% endif %}
+                    function(data) {
+                        if (data.error) {
+                            alert(data.msg);
+                            return;
+                        }
+                        lastClickedCommentId = -1;
+                        window.location.replace(data.url);
+                    });
+                }
+        });
+
+        $(".chargeCommentButton").click(function(e) {
+            var reg = /chargeComment(\d+)/;
+            var match = reg.exec(e.target.id);
+            if (match != null) {
+                lastClickedCommentId = match[1];
             }
         });
 
@@ -202,7 +233,10 @@
                 <tr class="trCharge" id="trCharge{{ charge.pk }}">
                     <td class="chargeDate">{{ charge.short_date }}</td>
                     <td class="chargeAccount" bgcolor="{{ charge.account.color }}">{{ charge.account.name }}</td>
-                    <td class="chargeName">{{ charge.name }}</td>
+                    <td class="chargeName">{{ charge.name }}
+                        {% if charge.comment %}
+                            <div class="pull-right glyphicon glyphicon-comment" data-toggle="tooltip" id="chargeCommentTooltip{{ charge.pk }}" title="{{ charge.comment }}"></div>
+                        {% endif %}</td>
                     <td class="chargeAmount {%if charge.amount < 0 %}danger{% else %}success{% endif %}">
                         {{ charge.amount }}
                     </td>
@@ -218,6 +252,11 @@
                             {% else %}
                             <span class="glyphicon glyphicon-tag"></span>
                             {% endif %}
+                        </button>
+
+                        <button type="button" id="chargeComment{{ charge.pk }}" class="btn btn-primary btn-xs chargeCommentButton"
+                                data-toggle="modal" data-target="#chargeCommentModal">
+                            <span class="glyphicon glyphicon-comment"></span>
                         </button>
 
                         {% if cur_account %}
@@ -306,6 +345,23 @@
                            style="background: {{ tag.color }}">{{ tag.name }}</a>
                         {% endfor %}
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="chargeCommentModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Comment charge</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="commentInput">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
