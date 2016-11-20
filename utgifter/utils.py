@@ -1,7 +1,9 @@
 import json
+import urllib.parse
 from datetime import date
 
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 
 from .models import Tag, SearchString, Matcher, Charge, Account
@@ -143,3 +145,12 @@ def get_account_from_request(request):
         account = None
 
     return account
+
+
+# http://stackoverflow.com/a/3766452
+def redirect_with_params(name, *args, **kwargs):
+    from django.core.urlresolvers import reverse
+    import urllib
+    url = reverse(name, args=args)
+    params = urllib.parse.urlencode(kwargs)
+    return HttpResponseRedirect(url + "?%s" % params)

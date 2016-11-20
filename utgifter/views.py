@@ -12,7 +12,8 @@ from .charge_parser import parse_nordea
 from .forms import TagForm, MatcherForm, AccountForm
 from .models import Charge, Matcher, Tag, SearchString, Account
 from .templatetags.tags import month_name_short
-from .utils import sanitize_date, sanitize_year, dump_data_to_json, load_data_from_json, get_account_from_request
+from .utils import sanitize_date, sanitize_year, dump_data_to_json, load_data_from_json, \
+    get_account_from_request, redirect_with_params
 
 
 @login_required
@@ -242,7 +243,12 @@ def charge_delete(request, charge_id):
 
 @login_required
 def assign_charge_tags(request):
-    charges = Charge.objects.filter(user=request.user)
+    account = get_account_from_request(request)
+
+    if account:
+        charges = Charge.objects.filter(user=request.user, account=account)
+    else:
+        charges = Charge.objects.filter(user=request.user)
     matchers = Matcher.objects.filter(user=request.user)
 
     for charge in charges:
@@ -263,8 +269,10 @@ def assign_charge_tags(request):
                     charge.matcher = matcher
                     charge.save()
                     break  # will only match the first searchstring, can't do multi-tagged charges
-
-    return redirect("charges")
+    if account:
+        return redirect_with_params("charges", account=account.pk)
+    else:
+        return redirect("charges")
 
 
 @login_required
@@ -285,9 +293,17 @@ def clear_charge_tag(request, charge_id):
 
 @login_required
 def clear_charge_tags(request):
-    Charge.objects.filter(user=request.user).update(tag=None, matcher=None)
+    account = get_account_from_request(request)
 
-    return redirect("charges")
+    if account:
+        Charge.objects.filter(user=request.user, account=account).update(tag=None, matcher=None)
+    else:
+        Charge.objects.filter(user=request.user).update(tag=None, matcher=None)
+
+    if account:
+        return redirect_with_params("charges", account=account.pk)
+    else:
+        return redirect("charges")
 
 
 @csrf_exempt

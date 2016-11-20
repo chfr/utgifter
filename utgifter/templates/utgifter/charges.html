@@ -143,12 +143,21 @@
                 {% include "utgifter/account_selector.html" %}
             </div>
             <div class="row col-md-10" style="margin-bottom: 5px;">
-                <a href="{% url 'assign_charge_tags' %}">
-                    <button class="btn btn-primary btn-sm">Assign tags</button>
-                </a>
-                <a href="{% url 'clear_charge_tags' %}">
-                    <button class="btn btn-primary btn-sm">Clear all tags</button>
-                </a>
+                {% if cur_account %}
+                    <a href="{% url 'assign_charge_tags' %}?account={{ cur_account.pk }}">
+                        <button class="btn btn-primary btn-sm">Assign tags</button>
+                    </a>
+                    <a href="{% url 'clear_charge_tags' %}?account={{ cur_account.pk }}">
+                        <button class="btn btn-primary btn-sm">Clear all tags</button>
+                    </a>
+                {% else %}
+                    <a href="{% url 'assign_charge_tags' %}">
+                                    <button class="btn btn-primary btn-sm">Assign tags</button>
+                                </a>
+                                <a href="{% url 'clear_charge_tags' %}">
+                                    <button class="btn btn-primary btn-sm">Clear all tags</button>
+                                </a>
+                {% endif %}
             </div>
             <div class="row">
                 <div class="col-md-12">
