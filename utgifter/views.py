@@ -140,7 +140,7 @@ def charges(request, display="all", year=0, month=0):
         while not charges:
             month -= 1
             if month == 0:
-                month = 1
+                month = 12
                 year -= 1
             if account:
                 charges = Charge.objects.filter(user=request.user, date__year=year, date__month=month,
