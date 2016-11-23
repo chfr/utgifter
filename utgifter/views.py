@@ -275,9 +275,9 @@ def assign_charge_tags(request):
     account = get_account_from_request(request)
 
     if account:
-        charges = Charge.objects.filter(user=request.user, account=account)
+        charges = Charge.objects.filter(user=request.user, account=account, tag=None)
     else:
-        charges = Charge.objects.filter(user=request.user)
+        charges = Charge.objects.filter(user=request.user, tag=None)
     matchers = Matcher.objects.filter(user=request.user)
 
     for charge in charges:
