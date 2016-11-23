@@ -12,8 +12,14 @@
 
     var lastClickedCharge = -1;
     var selectedCharges = [];
+    var lastClickedCommentId = -1;
 
     $(document).ready(function() {
+
+        $("#chargeCommentModal").on("shown.bs.modal", function() {
+                $("#commentInput").focus();
+            });
+
         $(".tagListItem").click(function(e) {
             if (lastClickedCharge != -1)
                 tagCharge(e);
@@ -53,6 +59,13 @@
             var match = reg.exec(e.target.id);
             if (match != null) {
                 lastClickedCommentId = match[1];
+
+                var id = "#chargeCommentTooltip" + match[1];
+                if ($(id).attr("data-original-title")) {
+                    $("#commentInput").val($(id).attr("data-original-title"));
+                } else {
+                    $("#commentInput").val("");
+                }
             }
         });
 
