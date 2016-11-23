@@ -7,7 +7,7 @@ from django.db import models
 
 class Account(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200, blank=False, null=False, unique=True)
+    name = models.CharField(max_length=200, blank=False, null=False)
     number = models.CharField(max_length=200, blank=True, verbose_name="Number (optional)")
     color = RGBColorField(default="#b9d8e7")
 
