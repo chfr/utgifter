@@ -32,6 +32,7 @@
             var match = reg.exec(e.target.id);
             if (match != null) {
                 lastClickedCharge = match[1];
+                $("#setTagModal").modal("show");
             }
         });
 
@@ -258,12 +259,11 @@
                         {{ charge.tag|default:""}}
                     </td>
                     <td>
-                        <button type="button" id="tagCharge{{ charge.pk }}" class="btn btn-primary btn-xs setTagButton"
-                                data-toggle="modal" data-target="#setTagModal">
+                        <button type="button" id="tagCharge{{ charge.pk }}" class="btn btn-primary btn-xs setTagButton">
                             {% if charge.tag %}
-                            <span class="glyphicon glyphicon-pencil"></span>
+                            <span id="tagCharge{{ charge.pk }}-glyph" class="glyphicon glyphicon-pencil setTagButton"></span>
                             {% else %}
-                            <span class="glyphicon glyphicon-tag"></span>
+                            <span id="tagCharge{{ charge.pk }}-glyph" class="glyphicon glyphicon-tag setTagButton"></span>
                             {% endif %}
                         </button>
 
