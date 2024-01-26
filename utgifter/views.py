@@ -515,6 +515,7 @@ def spreadsheet(request, year=0):
 
     months = [month_name_short(i + 1) for i in range(12)]
     tag_stats = []
+    total_row = dict(per_month=[0]*12, total=0, filtered_avg=0, true_avg=0)
 
     for tag in tags:
         sums_per_month = []  # list of each month's total for this particular tag
@@ -526,9 +527,12 @@ def spreadsheet(request, year=0):
             if month_sum is None:  # no charges for this month
                 month_sum = 0
                 num_empty += 1
+            else:
+                month_sum = int(month_sum)
 
             sums_per_month.append(month_sum)
             tag_year_total += month_sum
+            total_row["per_month"][month] += month_sum
 
         # Filtered average over the year, only averages over non-empty months.
         # In other words, if you had 100 EUR tagged as "food" in January and
@@ -538,9 +542,16 @@ def spreadsheet(request, year=0):
         filtered_avg = 0 if num_empty == 12 else tag_year_total/(12-num_empty)  # no zero division here mister
         true_avg = tag_year_total/12
 
+        total_row["total"] += tag_year_total
+        total_row["filtered_avg"] += filtered_avg
+        total_row["true_avg"] += true_avg
+
         tag_stats.append((tag, sums_per_month, tag_year_total, filtered_avg, true_avg))
 
-    context = {"months": months, "tag_stats": tag_stats, "year": year, "accounts": accounts}
+    total_row["filtered_avg"] /= 12
+    total_row["true_avg"] /= 12
+
+    context = {"months": months, "tag_stats": tag_stats, "total_row": total_row, "year": year, "accounts": accounts}
     if account:
         context["cur_account"] = account
 

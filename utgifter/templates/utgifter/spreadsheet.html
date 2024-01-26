@@ -69,6 +69,16 @@
                 <td>{{ true_avg|floatformat:0 }}</td>
             </tr>
             {% endfor %}
+            <tr>
+                <td><b>Total</b></td>
+                {% for month_total in total_row.per_month %}
+                    <td>{{ month_total|floatformat:0 }}</td>
+                {% endfor %}
+                <td></td>
+                <td>{{ total_row.total|floatformat:0 }}</td>
+                <td>{{ total_row.filtered_avg|floatformat:0 }}</td>
+                <td>{{ total_row.true_avg|floatformat:0 }}</td>
+            </tr>
         </table>
     </section>
     <aside>
