@@ -62,7 +62,7 @@ class Matcher(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     method = models.CharField(max_length=10, choices=METHOD_CHOICES, default=ICONTAINS)
-    tag = models.ForeignKey(Tag)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
     def match(self, needle, haystack):
         if self.method == self.EXACT:
